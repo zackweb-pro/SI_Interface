@@ -16,7 +16,7 @@ export default function Sign() {
         >
           <div className="form-container sign-up">
             <form>
-              <h1>Create Account</h1>
+              <h1>Demande</h1>
               <div
                 style={{
                   display: "flex",
@@ -31,24 +31,24 @@ export default function Sign() {
               <input type="email" placeholder="Email" />
               <input type="number" placeholder="Téléphone" />
 
-              <button>Sign Up</button>
+              <button>Demander</button>
             </form>
           </div>
           <div className="form-container sign-in">
             <form>
-              <h1>Sign In</h1>
+              <h1>Se Connecter</h1>
 
               <input type="email" placeholder="Email" />
               <input type="password" placeholder="Password" />
-              <a href="#">Forget Your Password?</a>
-              <button>Sign In</button>
+              <a href="#">Mot de passe oublié?</a>
+              <button>Se Connecter</button>
             </form>
           </div>
           <div className="toggle-container">
             <div className="toggle">
               <div className="toggle-panel toggle-left">
-                <h1>Welcome Back!</h1>
-                <p>Enter your personal details to use all of site features</p>
+                <h1>Bienvenue!</h1>
+                <p>Entrer votre informations ici pour envoyer une demande.</p>
                 <button
                   className=""
                   id="login"
@@ -56,15 +56,12 @@ export default function Sign() {
                     toggle_fun("");
                   }}
                 >
-                  Sign In
+                  Se connecter
                 </button>
               </div>
               <div className="toggle-panel toggle-right">
-                <h1>Hello, Friend!</h1>
-                <p>
-                  Register with your personal details to use all of site
-                  features
-                </p>
+                <h1>Bienvenue!</h1>
+                <p>Entrer votre informations ici</p>
                 <button
                   className=""
                   id="register"
@@ -72,7 +69,7 @@ export default function Sign() {
                     toggle_fun("active");
                   }}
                 >
-                  Sign Up
+                  Demander un compte
                 </button>
               </div>
             </div>
