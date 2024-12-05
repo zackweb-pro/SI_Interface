@@ -52,7 +52,8 @@ export default {
   			}
   		},
   		animation: {
-  			grid: 'grid 15s linear infinite'
+  			grid: 'grid 15s linear infinite',
+  			shine: 'shine var(--duration) infinite linear'
   		},
   		keyframes: {
   			grid: {
@@ -61,6 +62,17 @@ export default {
   				},
   				'100%': {
   					transform: 'translateY(0)'
+  				}
+  			},
+  			shine: {
+  				'0%': {
+  					'background-position': '0% 0%'
+  				},
+  				'50%': {
+  					'background-position': '100% 100%'
+  				},
+  				to: {
+  					'background-position': '0% 0%'
   				}
   			}
   		}

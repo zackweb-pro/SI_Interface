@@ -60,3 +60,8 @@
     --chart-5: 340 75% 55%;
   }
 }
+body{
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
