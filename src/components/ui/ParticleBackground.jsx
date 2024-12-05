@@ -27,7 +27,7 @@ const NeonBackground = () => {
       {[...Array(5)].map((_, index) => (
         <motion.div
           key={index}
-          className="absolute w-96 h-96 rounded-full bg-gradient-to-r from-blue-400 via-purple-800 to-blue-600 opacity-30 filter blur-3xl"
+          className="absolute w-96 h-96 rounded-full bg-gradient-to-r from-blue-400 via-blue-600 to-blue-800 opacity-30 filter blur-3xl"
           style={{
             position: "absolute",
             top: 0,
