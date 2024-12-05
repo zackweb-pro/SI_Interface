@@ -1,4 +1,4 @@
-import "../css/sign.css";
+import "../css/Sign.css";
 import { useState } from "react";
 import ParticleBackground from "./ui/ParticleBackground";
 export default function Sign() {
