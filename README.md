@@ -13,7 +13,7 @@ it's a very interesting journey
 
 ## Demo
 
-https://www.ecszd.netlify.app
+[https://www.ecszd.netlify.app](https://ecszd.netlify.app/)
 
 
 ## Installation
