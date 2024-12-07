@@ -122,7 +122,12 @@ export default function Sign() {
                     name="type"
                     value={formData.type}
                     onChange={handleChange}
-                    style={{ marginBottom: "20px" }}
+                    style={{
+                      display: "block",
+                      color: "#00A6FF",
+                      fontWeight: "500",
+                      margin: "10px auto 20px auto",
+                    }}
                   >
                     <option value="entreprise">Entreprise</option>
                     <option value="ecole">École</option>
@@ -150,7 +155,7 @@ export default function Sign() {
                       type="text"
                       placeholder={
                         formData.type === "entreprise"
-                          ? "Poste"
+                          ? "Sécteur"
                           : "Domaine d'études"
                       }
                       name="roleOrField"
@@ -222,7 +227,7 @@ export default function Sign() {
                     <p>
                       <strong>
                         {formData.type === "entreprise"
-                          ? "Poste"
+                          ? "Sécteur"
                           : "Domaine d'études"}
                         :
                       </strong>{" "}
