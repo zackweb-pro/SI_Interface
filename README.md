@@ -1,8 +1,8 @@
 
 # Etudiant cherche stage
 
-this project is an academic project that I and Doha Negraoui working for it together for the SI subject, in order to create a platform that will help students from different universities to find internships as well as those who have offers to publish them.
-it's a very interesting journey
+this project is an academic project that I and Doha Negraoui working for it together for the SI subject, in order to create a platform that will help students from different universities to find internships as well as those who have offers to publish on this website.
+it's a very interesting journey.
 
 ## Authors
 
