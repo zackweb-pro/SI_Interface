@@ -249,3 +249,7 @@ body{
   z-index: -1;
   top: 0;
 }
+.changefontsize p {
+  font-size: 12px;
+  margin: 0;
+}
