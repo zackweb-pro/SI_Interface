@@ -1,7 +1,7 @@
 import "../css/Sign.css";
 import { useState } from "react";
-import ParticleBackground from "./ui/ParticleBackground";
-import ShineBorder from "./ui/shine-border";
+import ParticleBackground from "../components/ui/ParticleBackground";
+import ShineBorder from "../components/ui/shine-border";
 import { motion } from "framer-motion";
 
 export default function Sign() {
