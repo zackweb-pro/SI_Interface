@@ -9,9 +9,9 @@ const App = () => {
   return (
     <Routes>
       {/* Dashboard route */}
-      <Route path="/dashboard" element={<Sign />} />
+      <Route path="/" element={<Sign />} />
 
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/dashboard" element={<Dashboard />} />
 
       {/* Routes inside the Dashboard */}
       <Route path="/offers" element={<Offers />} />
