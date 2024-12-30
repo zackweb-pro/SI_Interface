@@ -46,7 +46,7 @@ const UpdateCV = () => {
           className="w-full border border-gray-300 rounded-md p-2"
         ></textarea>
         <Button type="submit" className="w-full">
-          Update CV
+          Update CVs
         </Button>
       </form>
     </div>

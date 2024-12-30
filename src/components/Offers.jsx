@@ -4,7 +4,7 @@ const Offers = () => {
     const offers = [
         {
           id: 1,
-          title: 'Software Engineer',
+          title: 'Software Engineer student',
           organization: 'Oracle',
           type: 'Full-time',
           remote: true,
