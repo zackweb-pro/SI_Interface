@@ -67,10 +67,10 @@ const Offers = () => {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-800 mb-4 overflow-scroll">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
         Available Offers
       </h2>
-      <div className=" flex justify-center gap-4 flex-wrap">
+      <div className=" flex justify-center gap-4 flex-wrap overflow-y-scroll">
         {offers.map((offer) => (
           <Offer key={offer.id} offer={offer} />
         ))}

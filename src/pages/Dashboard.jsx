@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Home, BarChart, Users, Settings, Menu, LayoutDashboard } from "lucide-react";
+import {
+  Home,
+  BarChart,
+  Users,
+  Settings,
+  Menu,
+  LayoutDashboard,
+} from "lucide-react";
 
 import Offers from "@/components/Offers";
 import UpdateCV from "@/components/UpdateCV";
@@ -27,7 +34,7 @@ const Dashboard = () => {
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <div
-        className={`bg-gray-900 text-white h-screen transition-all duration-300 ${
+        className={` sidebar-menu bg-gray-900 text-white h-screen transition-all duration-300 ${
           isOpen ? "w-72" : "w-16"
         }`}
       >
@@ -37,7 +44,7 @@ const Dashboard = () => {
             onClick={toggleSidebar}
             className="text-white hover:text-gray-400 focus:outline-none"
           >
-           <LayoutDashboard />
+            <LayoutDashboard />
           </button>
         </div>
 
@@ -53,9 +60,13 @@ const Dashboard = () => {
                     : "hover:bg-gray-700 text-gray-400"
                 }`}
               >
-                <span className={`group-hover:text-white ${
-                  activeSection === item.value ? "text-white" : "text-gray-400"
-                }`}>
+                <span
+                  className={`group-hover:text-white ${
+                    activeSection === item.value
+                      ? "text-white"
+                      : "text-gray-400"
+                  }`}
+                >
                   {item.icon}
                 </span>
                 <span
@@ -71,12 +82,14 @@ const Dashboard = () => {
         </ul>
 
         {/* User Profile */}
-        <div className={`absolute bottom-0 px-4 py-4 border-t border-gray-700 duration-300 transition-width ${
-          isOpen ? "w-72" : "w-16"
-        }`}>
+        <div
+          className={`absolute bottom-0 px-4 py-4 border-t border-gray-700 duration-300 transition-width ${
+            isOpen ? "w-72" : "w-16"
+          }`}
+        >
           <button
             onClick={toggleUserProfile}
-            className="flex items-center space-x-2 text-gray-400 hover:text-white" 
+            className="flex items-center space-x-2 text-gray-400 hover:text-white"
           >
             {user.picture && (
               <img
@@ -85,7 +98,11 @@ const Dashboard = () => {
                 className="w-8 h-8 rounded-full"
               />
             )}
-            <span className={`transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0"}`}>
+            <span
+              className={`transition-opacity duration-300 ${
+                isOpen ? "opacity-100" : "opacity-0"
+              }`}
+            >
               {user.name}
               <br />
               <span className="text-sm">{user.email}</span>
@@ -93,7 +110,7 @@ const Dashboard = () => {
           </button>
 
           {isUserProfileOpen && (
-            <div className="absolute bottom-14 right-4 bg-gray-800 text-white p-4 border border-gray-700">
+            <div className=" edit-profile-div absolute bottom-14 right-4 bg-gray-800 text-white p-4 border border-gray-700">
               <ul>
                 <li className="py-2 hover:bg-gray-700">
                   <a href="#">View Profile</a>
