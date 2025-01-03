@@ -260,3 +260,11 @@ body {
   font-size: 12px;
   margin: 0;
 }
+.EIrz6a_level-left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  /* gap: 10px; */
+  padding: 10px;
+}
