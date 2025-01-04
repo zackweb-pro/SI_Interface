@@ -11,6 +11,7 @@ import {
 
 import Offers from "@/components/Offers";
 import UpdateCV from "@/components/UpdateCV";
+import profile from "@/assets/images/profile.png";
 // import react from '@/assets/react.png';
 
 const Dashboard = () => {
@@ -18,9 +19,9 @@ const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("offers");
   const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
   const user = {
-    name: "John Doe",
-    email: "johndoe@example.com",
-    picture: "https://randomuser.me/api/portraits",
+    name: "Zakaria OUMGAHR",
+    email: "zakaria.oumghar@gmail.com",
+    picture: profile,
   };
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleUserProfile = () => setIsUserProfileOpen(!isUserProfileOpen);

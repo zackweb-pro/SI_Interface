@@ -268,3 +268,8 @@ body {
   /* gap: 10px; */
   padding: 10px;
 }
+h5.EIrz6a_title.EIrz6a_is-marginless.EIrz6a_level-left.EIrz6a_is-size-5 {
+  padding: 0 10px 0 0;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}

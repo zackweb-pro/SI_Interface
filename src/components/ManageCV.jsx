@@ -93,7 +93,7 @@ export default function CVEditor({
 
   const handleAddSection = (type) => {
     if (type && sectionTemplates[type]) {
-      setCvData((prev) => ({
+      setSections((prev) => ({
         ...prev,
         sections: [...prev.sections, sectionTemplates[type]],
       }));
