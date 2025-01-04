@@ -104,7 +104,7 @@ export default function CVEditor({
   };
 
   const handleUpdateSection = (index, updatedSection) => {
-    setCvData((prev) => {
+    setSections((prev) => {
       const updatedSections = [...prev.sections];
       updatedSections[index] = updatedSection;
       return { ...prev, sections: updatedSections };
@@ -112,7 +112,7 @@ export default function CVEditor({
   };
 
   const handleRemoveSection = (index) => {
-    setCvData((prev) => ({
+    setSections((prev) => ({
       ...prev,
       sections: prev.sections.filter((_, i) => i !== index),
     }));

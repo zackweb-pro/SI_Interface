@@ -31,19 +31,22 @@ export default function UpdateCV() {
     {
       type: "common-list",
       title: "Education",
+      icon: "graduation",
       items: [
         {
-          title: "Software Engineering",
-          authority: "ENSIAS, Rabat",
-          rightSide: "2021 - Present",
+          title:
+            "2 years of preparatory classes for engineering schools (CPGE)",
+          authority: "CPGE",
+          authorityWebSite: "https://www.cpge.ac.ma/",
+          rightSide: "2021 - 2023",
         },
         {
-          title: "High School Diploma",
-          authority: "Berrechid High School",
-          rightSide: "2020",
+          title: "SOFTWARE ENGINEER (SE)",
+          authority: "ENSIAS",
+          authorityWebSite: "https://www.ensias.um5.ac.ma/",
+          rightSide: "2023 - Present",
         },
       ],
-      icon: "graduation",
     },
     {
       type: "experiences-list",
@@ -54,11 +57,33 @@ export default function UpdateCV() {
           company: "SOMAP",
           description:
             "Worked on a management system for purchases and personnel.",
+          companyMeta: "",
           datesBetween: "2024",
           descriptionTags: ["React", "Node.js", "MySQL"],
         },
       ],
       icon: "archive",
+    },
+    {
+      type: "projects-list",
+      title: "Projects",
+      description: "Voici quelques projets sur lesquels j'ai travaillé",
+      icon: "tasks",
+      groups: [
+        {
+          sectionHeader:
+            "application web de gestion des achats et du personnel",
+          description: " ",
+          items: [
+            {
+              title: "Lien du projet",
+              projectUrl: "https://github.com/zackweb-pro",
+              description:
+                "j'ai travaillé sur un système de gestion des achats et du personnel",
+            },
+          ],
+        },
+      ],
     },
     {
       type: "tag-list",
