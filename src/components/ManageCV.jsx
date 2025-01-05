@@ -17,26 +17,6 @@ export default function CVEditor({
   sections,
   setSections,
 }) {
-  const [cvData, setCvData] = useState({
-    personalData: {
-      name: "S. Berkay Aydin",
-      title: "Senior Software Developer",
-      image: "https://bulma.io/images/placeholders/128x128.png",
-      contacts: [
-        { type: "email", value: "john@example.com" },
-        { type: "phone", value: "+00 (123) 456 78 90" },
-      ],
-    },
-    sections: [
-      {
-        type: "text",
-        title: "Career Profile",
-        content: `When I was a child, I always wanted to be a developer.`,
-        icon: "usertie",
-      },
-    ],
-  });
-
   const [newSectionType, setNewSectionType] = useState(null);
 
   const sectionTemplates = {
@@ -54,7 +34,8 @@ export default function CVEditor({
         {
           title: "Degree",
           authority: "Institution Name",
-          rightSide: "Year",
+          authorityWebSite: "https://example.com",
+          rightSide: "YYYYY-YYYY or YYYYY-Present",
         },
       ],
     },
@@ -68,18 +49,26 @@ export default function CVEditor({
           company: "Company Name",
           datesBetween: "Start - End",
           description: "",
+          descriptionTags: "Skills used in this job comma separated",
         },
       ],
     },
     projects: {
       type: "projects-list",
       title: "Projects",
+      description: "Voici quelques projets sur lesquels j'ai travaillé",
       icon: "tasks",
       groups: [
         {
-          sectionHeader: "Project Group",
+          sectionHeader: "Project Name",
           description: "",
-          items: [{ title: "Project Name", description: "" }],
+          items: [
+            {
+              title: "Project Link",
+              projectUrl: "https://projectlink.com",
+              description: "",
+            },
+          ],
         },
       ],
     },
@@ -88,6 +77,12 @@ export default function CVEditor({
       title: "Skills Proficiency",
       icon: "rocket",
       items: ["Skill 1", "Skill 2"],
+    },
+    languanges: {
+      type: "common-list",
+      title: "Languages",
+      items: [{ authority: "Language", authorityMeta: "Professioncy" }],
+      icon: "language",
     },
   };
 
@@ -119,7 +114,7 @@ export default function CVEditor({
   };
 
   const handleAddItemToSection = (sectionIndex, itemTemplate) => {
-    setCvData((prev) => {
+    setSections((prev) => {
       const updatedSections = [...prev.sections];
 
       const section = updatedSections[sectionIndex];
@@ -136,7 +131,7 @@ export default function CVEditor({
     });
   };
   const handleRemoveItemFromSection = (sectionIndex, itemIndex) => {
-    setCvData((prev) => {
+    setSections((prev) => {
       const updatedSections = [...prev.sections];
 
       const section = updatedSections[sectionIndex];
@@ -150,7 +145,8 @@ export default function CVEditor({
   };
   const handleAddContact = () => {
     const newContact = { type: "", value: "" };
-    // Update the contacts array with the new contact
+    // Update the contacts array with the new contactmkdir controllers models routes config middlewares utils
+
     setPersonalData((prevData) => ({
       ...prevData,
       contacts: [...prevData.contacts, newContact],
