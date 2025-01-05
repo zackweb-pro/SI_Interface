@@ -88,22 +88,15 @@ export default function CVEditor({
 
   const handleAddSection = (type) => {
     if (type && sectionTemplates[type]) {
-      setSections((prev) => ({
-        ...prev,
-        sections: [...prev.sections, sectionTemplates[type]],
-      }));
+      setSections((prev) => [...prev, sectionTemplates[type]]);
     }
-    setSections([...sections, newSection]);
+    setSections({ ...sections, newSection });
 
     setNewSectionType(null); // Reset dropdown
   };
 
-  const handleUpdateSection = (index, updatedSection) => {
-    setSections((prev) => {
-      const updatedSections = [...prev.sections];
-      updatedSections[index] = updatedSection;
-      return { ...prev, sections: updatedSections };
-    });
+  const handleUpdateSection = (key, updatedSection) => {
+    setSections((prev) => ({ ...prev, [key]: updatedSection }));
   };
 
   const handleRemoveSection = (index) => {
@@ -259,7 +252,7 @@ export default function CVEditor({
       </Card>
 
       {/* Sections */}
-      {sections.map((section, index) => (
+      {Object.entries(sections).map(([key, section], index) => (
         <Card className="mb-4" key={index}>
           <CardHeader>
             <CardTitle>{section.title}</CardTitle>
@@ -268,12 +261,16 @@ export default function CVEditor({
             {section.type === "text" && (
               <Textarea
                 value={section.content}
-                onChange={(e) =>
-                  handleUpdateSection(index, {
+                onChange={(e) => {
+                  console.log(typeof section);
+                  var val = e.target.value;
+                  // var content_list = [];
+                  console.log("val", val);
+                  handleUpdateSection(key, {
                     ...section,
-                    content: e.target.value,
-                  })
-                }
+                    content: val,
+                  });
+                }}
                 placeholder="Write content..."
                 className="w-full"
               />
@@ -287,7 +284,7 @@ export default function CVEditor({
                       onChange={(e) => {
                         const updatedItems = [...section.items];
                         updatedItems[itemIndex].title = e.target.value;
-                        handleUpdateSection(index, {
+                        handleUpdateSection(key, {
                           ...section,
                           items: updatedItems,
                         });
@@ -300,7 +297,7 @@ export default function CVEditor({
                       onChange={(e) => {
                         const updatedItems = [...section.items];
                         updatedItems[itemIndex].authority = e.target.value;
-                        handleUpdateSection(index, {
+                        handleUpdateSection(key, {
                           ...section,
                           items: updatedItems,
                         });
@@ -308,19 +305,70 @@ export default function CVEditor({
                       placeholder="Institution or Authority"
                       className="mb-2"
                     />
+                    <Input
+                      value={item.authorityWebSite || ""}
+                      onChange={(e) => {
+                        const updatedItems = [...section.items];
+                        updatedItems[itemIndex].authorityWebSite =
+                          e.target.value;
+                        handleUpdateSection(key, {
+                          ...section,
+                          items: updatedItems,
+                        });
+                      }}
+                      placeholder="Institution or Authority's Website"
+                      className="mb-2"
+                    />
+                    <Input
+                      value={item.rightSide || ""}
+                      onChange={(e) => {
+                        const updatedItems = [...section.items];
+                        updatedItems[itemIndex].rightSide = e.target.value;
+                        handleUpdateSection(key, {
+                          ...section,
+                          items: updatedItems,
+                        });
+                      }}
+                      placeholder="YYYYY-YYYY or YYYYY-Present"
+                      className="mb-2"
+                    />
+                    <Button
+                      variant="destructive"
+                      onClick={() => {
+                        setSections((prevData) => ({
+                          ...prevData,
+                          education: {
+                            ...prevData.education,
+                            items: prevData.education.items.filter(
+                              (_, i) => i !== itemIndex
+                            ),
+                          }, // Remove contact by index
+                        }));
+                      }}
+                    >
+                      <Trash size={16} />
+                    </Button>
                   </div>
                 ))}
                 <Button
                   variant="outline"
                   className="mt-2"
                   onClick={() =>
-                    handleUpdateSection(index, {
-                      ...section,
-                      items: [
-                        ...section.items,
-                        { title: "", authority: "", rightSide: "" },
-                      ],
-                    })
+                    setSections((prevData) => ({
+                      ...prevData,
+                      education: {
+                        ...prevData.education,
+                        items: [
+                          ...prevData.education.items,
+                          {
+                            title: "",
+                            authority: "",
+                            authorityWebSite: "",
+                            rightSide: "",
+                          },
+                        ],
+                      }, // Remove contact by index
+                    }))
                   }
                 >
                   <Plus size={16} className="mr-2" /> Add Item

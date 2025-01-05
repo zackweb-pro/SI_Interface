@@ -21,14 +21,15 @@ export default function UpdateCV() {
     ],
   });
 
-  const [sections, setSections] = useState([
-    {
+  const [sections, setSections] = useState({
+    career: {
       type: "text",
       title: "Career Profile",
-      content: `Greetings! I'm Zakaria Oumghar, a dedicated software engineering student at ENSIAS. I'm deeply passionate about programming, diving into new technologies, and exploring creativity and art.`,
+      content:
+        "Greetings! I'm Zakaria Oumghar, a dedicated software engineering student at ENSIAS. I'm deeply passionate about programming, diving into new technologies, and exploring creativity and art.",
       icon: "usertie",
     },
-    {
+    education: {
       type: "common-list",
       title: "Education",
       icon: "graduation",
@@ -48,13 +49,14 @@ export default function UpdateCV() {
         },
       ],
     },
-    {
+    experience: {
       type: "experiences-list",
       title: "Experiences",
       items: [
         {
           title: "Software Developer Intern",
           company: "SOMAP",
+          companyWebSite: "https://www.somap.ma/",
           description:
             "Worked on a management system for purchases and personnel.",
           companyMeta: "",
@@ -64,7 +66,7 @@ export default function UpdateCV() {
       ],
       icon: "archive",
     },
-    {
+    projects: {
       type: "projects-list",
       title: "Projects",
       description: "Voici quelques projets sur lesquels j'ai travaillé",
@@ -85,13 +87,13 @@ export default function UpdateCV() {
         },
       ],
     },
-    {
+    skills: {
       type: "tag-list",
       title: "Skills Proficiency",
       items: ["React", "Node.js", "JavaScript", "CSS", "SQL"],
       icon: "rocket",
     },
-    {
+    languages: {
       type: "common-list",
       title: "Languages",
       items: [
@@ -101,12 +103,24 @@ export default function UpdateCV() {
       ],
       icon: "language",
     },
-  ]);
+  });
   // console.log(sections);
+  // console.log(Object.values(sections));
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.text("CV", 10, 10);
+    doc.save("CV.pdf");
+  };
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Your CV</h1>
-      <CV personalData={personalData} sections={sections} branding={false} />
+      <CV
+        personalData={personalData}
+        sections={Object.values(sections)}
+        branding={false}
+      />
+      <button onClick={generatePDF}>Download PDF</button>
+
       <CVEditor
         personalData={personalData}
         setPersonalData={setPersonalData}
