@@ -24,7 +24,7 @@ export default function UpdateCV() {
   const [sections, setSections] = useState({
     career: {
       type: "text",
-      title: "Career Profile",
+      title: "About Me",
       content:
         "Greetings! I'm Zakaria Oumghar, a dedicated software engineering student at ENSIAS. I'm deeply passionate about programming, diving into new technologies, and exploring creativity and art.",
       icon: "usertie",
