@@ -675,6 +675,94 @@ export default function CVEditor({
                 </div>
               </>
             )}
+
+            {section.type === "common-list" &&
+              section.title === "Languages" && (
+                <>
+                  {section.items.map((language, indexitem) => (
+                    <div
+                      className="flex items-center gap-2 mb-2"
+                      key={indexitem}
+                    >
+                      <Input
+                        value={language.authority}
+                        onChange={(e) => {
+                          const updatedContacts = [...section.items];
+
+                          updatedContacts[indexitem].authority = e.target.value;
+
+                          handleUpdateSection(key, {
+                            ...section,
+                            items: updatedContacts,
+                          });
+                        }}
+                        placeholder="Language"
+                        className="flex-1"
+                      />
+
+                      <Input
+                        value={language.authorityMeta}
+                        onChange={(e) => {
+                          const updatedContacts = [...section.items];
+
+                          updatedContacts[indexitem].authorityMeta =
+                            e.target.value;
+
+                          handleUpdateSection(key, {
+                            ...section,
+                            items: updatedContacts,
+                          });
+                        }}
+                        placeholder="Your professioncy in this language"
+                        className="flex-1"
+                      />
+
+                      <Button
+                        variant="destructive"
+                        onClick={() => {
+                          setSections((prevData) => ({
+                            ...prevData,
+                            languages: {
+                              ...prevData.languages,
+                              items: prevData.languages.items.filter(
+                                (_, i) => i !== indexitem
+                              ),
+                            }, // Remove contact by index
+                          }));
+                        }}
+                      >
+                        <Trash size={16} />
+                      </Button>
+                    </div>
+                  ))}
+
+                  <div className="add-rm-wrapper">
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        setSections((prevData) => ({
+                          ...prevData,
+                          languages: {
+                            ...prevData.languages,
+                            items: [
+                              ...prevData.languages.items,
+                              { authority: "", authorityMeta: "" },
+                            ],
+                          }, // Remove contact by index
+                        }))
+                      }
+                    >
+                      <Plus size={16} className="mr-2" /> Add Item
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleRemoveSection(key)}
+                    >
+                      <Trash size={16} className="mr-2" /> Remove Section
+                    </Button>
+                  </div>
+                </>
+              )}
           </CardContent>
         </Card>
       ))}

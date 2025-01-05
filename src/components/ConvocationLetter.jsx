@@ -1,32 +1,43 @@
 import React from "react";
+import { motion } from "framer-motion";
 
-const ConvocationLetter = ({
-  studentName,
-  interviewDate,
-  interviewTime,
-  interviewLocation,
-  jobTitle,
-  additionalNotes,
-}) => {
+const ConvocationCard = ({ details }) => {
+  const {
+    candidateName,
+    interviewDate,
+    interviewTime,
+    interviewLocation,
+    jobTitle,
+    additionalNotes,
+    postedAt,
+  } = details;
+
   return (
-    <div className="bg-gray-100 p-8 rounded-lg shadow-lg max-w-xl mx-auto">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-800">Convocation Letter</h1>
-        <p className="text-gray-600 mt-2">From the HR Department</p>
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      whileHover={{ scale: 1.02 }}
+      className="relative bg-white shadow-lg rounded-lg overflow-hidden transform hover:shadow-2xl"
+    >
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#E1372F] to-[#FF6B6B] p-5 text-white">
+        <h2 className="text-2xl font-bold">Interview Invitation</h2>
+        <p className="text-sm opacity-90">HR Department</p>
       </div>
-      <div className="mt-6">
-        <p className="text-gray-800">
-          Dear <span className="font-semibold">{studentName}</span>,
-        </p>
-        <p className="mt-4 text-gray-600 leading-6">
-          We are pleased to invite you to attend an interview for the position
-          of <span className="font-semibold">{jobTitle}</span>. This is a great
-          opportunity to showcase your skills and learn more about the role.
-        </p>
-        <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
-          <h2 className="text-lg font-semibold text-gray-700 mb-3">
-            Interview Details:
-          </h2>
+
+      {/* Body */}
+      <div className="p-6">
+        {/* Candidate Details */}
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">
+          Candidate: {candidateName}
+        </h3>
+
+        {/* Interview Details */}
+        <div className="bg-[#F9FAFB] p-4 rounded-lg shadow-md mb-4">
+          <p className="text-gray-800">
+            <strong>Job Title:</strong> {jobTitle}
+          </p>
           <p className="text-gray-800">
             <strong>Date:</strong> {interviewDate}
           </p>
@@ -37,29 +48,28 @@ const ConvocationLetter = ({
             <strong>Location:</strong> {interviewLocation}
           </p>
         </div>
+
+        {/* Additional Notes */}
         {additionalNotes && (
-          <div className="mt-6 bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-gray-700 mb-3">
-              Additional Notes:
-            </h2>
+          <div className="bg-[#FFF8E5] p-4 rounded-lg shadow-md mb-4">
+            <h3 className="text-md font-semibold text-[#FF6B6B] mb-2">
+              Additional Notes
+            </h3>
             <p className="text-gray-600">{additionalNotes}</p>
           </div>
         )}
-        <p className="mt-6 text-gray-600">
-          Please arrive at least 15 minutes early and bring a copy of your
-          updated resume along with any relevant documents.
-        </p>
-        <p className="mt-6 text-gray-800">
-          We look forward to meeting you and wish you the best of luck!
-        </p>
-        <p className="mt-6 text-gray-800">
-          Best regards,
-          <br />
-          <span className="font-semibold">The HR Team</span>
-        </p>
+
+        {/* Footer */}
+        <div className="flex justify-between items-center">
+          <button className="relative group bg-[#E1372F] text-white py-2 px-6 rounded-lg font-semibold hover:bg-[#B53029] duration-300">
+            Confirm Attendance
+            <span className="absolute inset-0 bg-[#FF6B6B] rounded-lg opacity-0 group-hover:opacity-20 duration-300"></span>
+          </button>
+          <p className="text-xs text-gray-500">Posted: {postedAt}</p>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
-export default ConvocationLetter;
+export default ConvocationCard;

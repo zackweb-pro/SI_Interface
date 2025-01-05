@@ -7,11 +7,13 @@ import {
   Settings,
   Menu,
   LayoutDashboard,
+  FileCheck2,
 } from "lucide-react";
 
 import Offers from "@/components/Offers";
 import UpdateCV from "@/components/UpdateCV";
 import profile from "@/assets/images/profile.png";
+import PageDesConvo from "@/components/PageDesConvo";
 // import react from '@/assets/react.png';
 
 const Dashboard = () => {
@@ -29,6 +31,7 @@ const Dashboard = () => {
   const menuItems = [
     { icon: <Home />, label: "Offers", value: "offers" },
     { icon: <BarChart />, label: "Update CV", value: "update-cv" },
+    { icon: <FileCheck2 />, label: "Convocation", value: "convo" },
   ];
 
   return (
@@ -136,6 +139,7 @@ const Dashboard = () => {
       >
         {activeSection === "offers" && <Offers />}
         {activeSection === "update-cv" && <UpdateCV />}
+        {activeSection === "convo" && <PageDesConvo />}
       </motion.div>
     </div>
   );
