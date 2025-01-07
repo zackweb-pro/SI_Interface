@@ -51,7 +51,7 @@ export default function Sign() {
 
       setFormData({
         ...formData,
-
+        institution_id: institutionId,
         companyOrSchoolName: selected[1],
 
         roleOrField: selected[2],
@@ -67,7 +67,7 @@ export default function Sign() {
         ...formData,
 
         companyOrSchoolName: "",
-
+        institution_id: null,
         roleOrField: "",
 
         contactPhone: "",
@@ -109,6 +109,7 @@ export default function Sign() {
             lastName: formData.lastName,
             email: formData.email,
             phone: formData.phone,
+            institution_id: formData.institution_id,
             companyOrSchoolName: formData.companyOrSchoolName,
             roleOrField: formData.roleOrField,
             contactPhone: formData.contactPhone,
@@ -126,6 +127,7 @@ export default function Sign() {
           email: "",
           phone: "",
           type: "entreprise",
+          institution_id: null,
           companyOrSchoolName: "",
           roleOrField: "",
           contactPhone: "",
@@ -134,6 +136,7 @@ export default function Sign() {
         setStep(1); // Reset to the first step
       } else {
         const errorData = await response.json();
+        console.log(errorData);
         alert(`Failed to submit the request: ${errorData.message}`);
       }
     } catch (error) {

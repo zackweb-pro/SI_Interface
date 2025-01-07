@@ -3,6 +3,7 @@ const cors = require("cors");
 const connectToDb = require("./config/dbConfig");
 const adminRoutes = require("./routes/adminRoutes");
 const respoRoutes = require("./routes/respoRoutes");
+const loginRoutes = require("./routes/loginRoutes");
 
 const app = express();
 const PORT = 3000;
@@ -26,6 +27,7 @@ connectToDb();
 // Routes
 app.use("/api/admins", adminRoutes);
 app.use("/api/respo", respoRoutes);
+app.use("/api/login", loginRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
