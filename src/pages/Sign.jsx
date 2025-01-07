@@ -4,6 +4,35 @@ import ParticleBackground from "../components/ui/ParticleBackground";
 import ShineBorder from "../components/ui/shine-border";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
+import axios from "axios";
+
+const decodeJWT = (token) => {
+  if (!token) return null;
+
+  try {
+    const [header, payload, signature] = token.split(".");
+    const base64UrlToJson = (base64Url) =>
+      JSON.parse(
+        decodeURIComponent(
+          atob(base64Url.replace(/-/g, "+").replace(/_/g, "/"))
+            .split("")
+            .map(
+              (char) => `%${`00${char.charCodeAt(0).toString(16)}`.slice(-2)}`
+            )
+            .join("")
+        )
+      );
+
+    return {
+      header: base64UrlToJson(header),
+      payload: base64UrlToJson(payload),
+      signature,
+    };
+  } catch (error) {
+    console.error("Error decoding token:", error.message);
+    return null;
+  }
+};
 export default function Sign() {
   const [toggle_attr, toggle_fun] = useState("");
   const [step, setStep] = useState(1);
@@ -23,6 +52,10 @@ export default function Sign() {
   const [selectedInstitution, setSelectedInstitution] = useState(null);
 
   const [showAddInstitutionForm, setShowAddInstitutionForm] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchInstitutions();
@@ -149,6 +182,33 @@ export default function Sign() {
     hidden: { opacity: 0, x: 100 },
     visible: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -100 },
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post("http://localhost:3000/api/login", {
+        email,
+        password,
+      });
+      const { token } = response.data;
+
+      // Store token in localStorage
+      localStorage.setItem("authToken", token);
+      const decodedToken = decodeJWT(token);
+      console.log(
+        "role: " + decodedToken.payload.role,
+        "email: " + decodedToken.payload.email,
+        "id: " + decodedToken.payload.id,
+        "nom: " + decodedToken.payload.nom,
+        "prenom: " + decodedToken.payload.prenom
+      );
+      // alert("Login successful");
+      // window.location.href = "/dashboard";
+    } catch (err) {
+      setError(err.response.data.error || "Login failed");
+    }
   };
 
   return (
@@ -397,11 +457,19 @@ export default function Sign() {
         <div className="form-container sign-in">
           <form>
             <h1>Se Connecter</h1>
-
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <input
+              type="email"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
             <a href="#">Mot de passe oublié?</a>
-            <button>Se Connecter</button>
+            <button onClick={handleLogin}>Se Connecter</button>
           </form>
         </div>
 

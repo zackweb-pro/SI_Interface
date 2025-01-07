@@ -1,49 +1,72 @@
 const jwt = require("jsonwebtoken");
-
-exports.login = async (req, res) => {
+const getConnection = require("../config/dbConfig");
+const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const connection = await getConnection();
 
-    // Check if the user exists
-    const query = `
-      SELECT id, email, password, isconfirmed, type
-      FROM (
-        SELECT id, email, password, isconfirmed, 'respo_ecole' AS type FROM Respo_Ecole
-        UNION ALL
-        SELECT id, email, password, isconfirmed, 'respo_entreprise' AS type FROM Respo_Entreprise
-        UNION ALL
-        SELECT id, email, password, isconfirmed, 'admin' AS type FROM Admin
-      ) WHERE email = :email
-    `;
-    const result = await connection.execute(query, { email });
+    // JWT secret key (make sure to keep this secure and use environment variables in production)
+    const JWT_SECRET = "your_jwt_secret_key";
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "User not found" });
+    // Query the Admin table
+    const adminQuery = `SELECT id, nom, prenom, email FROM Admin WHERE email = :email AND password = :password`;
+    const adminResult = await connection.execute(adminQuery, { email, password });
+
+    if (adminResult.rows.length > 0) {
+      const admin = adminResult.rows[0];
+      console.log("Admin:", admin);
+      const token = jwt.sign(
+        { id: admin[0], role: "admin", email: admin[3], nom: admin[1], prenom: admin[2] },
+        JWT_SECRET,
+        { expiresIn: "24h" } // Token valid for 24 hours
+      );
+      return res.status(200).json({ message: "Login successful", token, user: { ...admin, role: "admin" } });
     }
 
-    const [user] = result.rows;
-    const [id, storedEmail, storedPassword, isConfirmed, type] = user;
+    // Query the Respo_Ecole table
+    const respoEcoleQuery = `SELECT id, nom, prenom, email, isconfirmed FROM Respo_Ecole WHERE email = :email AND password = :password`;
+    const respoEcoleResult = await connection.execute(respoEcoleQuery, { email, password });
 
-    // Check if the account is confirmed
-    if (isConfirmed === 0) {
-      return res.status(403).json({ error: "Account not confirmed" });
+    if (respoEcoleResult.rows.length > 0) {
+      const respoEcole = respoEcoleResult.rows[0];
+
+      if (respoEcole.ISCONFIRMED === 0) {
+        return res.status(403).json({ error: "Account not confirmed. Please contact the administrator." });
+      }
+
+      const token = jwt.sign(
+        { id: respoEcole[0], role: "respo_ecole", email: respoEcole[3], nom: respoEcole[1], prenom: respoEcole[2] },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      return res.status(200).json({ message: "Login successful", token, user: { ...respoEcole, role: "respo_ecole" } });
     }
 
-    // Compare the plain-text password with the stored password
-    if (password !== storedPassword) {
-      return res.status(401).json({ error: "Invalid password" });
+    // Query the Respo_Entreprise table
+    const respoEntrepriseQuery = `SELECT id, nom, prenom, email, isconfirmed FROM Respo_Entreprise WHERE email = :email AND password = :password`;
+    const respoEntrepriseResult = await connection.execute(respoEntrepriseQuery, { email, password });
+
+    if (respoEntrepriseResult.rows.length > 0) {
+      const respoEntreprise = respoEntrepriseResult.rows[0];
+
+      if (respoEntreprise.ISCONFIRMED === 0) {
+        return res.status(403).json({ error: "Account not confirmed. Please contact the administrator." });
+      }
+
+      const token = jwt.sign(
+        { id: respoEntreprise[0], role: "respo_entreprise", email: respoEntreprise[3], nom: respoEntreprise[1], prenom: respoEntreprise[2] },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      return res.status(200).json({ message: "Login successful", token, user: { ...respoEntreprise, role: "respo_entreprise" } });
     }
 
-    // Generate JWT
-    const token = jwt.sign({ id, email: storedEmail, type }, "your_secret_key", {
-      expiresIn: "1h",
-    });
-
-    res.json({ message: "Login successful", token });
+    // If no match is found
+    return res.status(401).json({ error: "Invalid credentials" });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ error: "Failed to login" });
+    res.status(500).json({ error: "An error occurred during login" });
   }
 };
+exports.login = login;
