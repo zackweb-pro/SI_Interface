@@ -11,7 +11,7 @@ app.use(bodyParser.json()); // Parse JSON bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
-const userRoutes = require('./routes/userRoutes'); // Example route
+const userRoutes = require('./routes/adminRoutes'); // Example route
 app.use('/api/users', userRoutes);
 
 // Export the app
