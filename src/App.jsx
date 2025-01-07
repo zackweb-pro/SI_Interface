@@ -1,9 +1,12 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Dashboard from "@/pages/Dashboard";
+import StudentEspace from "@/pages/StudentEspace";
 import Offers from "./components/Offers";
 import UpdateCV from "./components/UpdateCV";
 import Sign from "./pages/Sign";
+import RECDashboard from "./pages/RECDashboard";
+import RENDashboard from "./pages/RENDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const App = () => {
   return (
@@ -11,11 +14,11 @@ const App = () => {
       {/* Dashboard route */}
       <Route path="/" element={<Sign />} />
 
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/student-espace" element={<StudentEspace />} />
 
-      {/* Routes inside the Dashboard */}
-      <Route path="/offers" element={<Offers />} />
-      <Route path="/update-cv" element={<UpdateCV />} />
+      <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/respo-ecole-dashboard" element={<RECDashboard />} />
+      <Route path="/respo-entreprise-dashboard" element={<RENDashboard />} />
     </Routes>
   );
 };
