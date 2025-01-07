@@ -15,24 +15,30 @@ import Offers from "@/components/Offers";
 import UpdateCV from "@/components/UpdateCV";
 import profile from "@/assets/images/profile.png";
 import PageDesConvo from "@/components/PageDesConvo";
+import decodeJWT from "@/components/DecodeJWT";
+
 // import react from '@/assets/react.png';
 
 const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const [activeSection, setActiveSection] = useState("offers");
+  const [activeSection, setActiveSection] = useState("ajouter-offre");
   const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
+  const { nom, prenom, email, id, role } = decodeJWT(
+    localStorage.getItem("authToken")
+  ).payload;
   const user = {
-    name: "Zakaria OUMGAHR",
-    email: "zakaria.oumghar@gmail.com",
-    picture: profile,
+    name: nom + " " + prenom,
+    email: email,
+    picture: nom.substr(0, 2).toUpperCase(),
   };
   const toggleSidebar = () => setIsOpen(!isOpen);
   const toggleUserProfile = () => setIsUserProfileOpen(!isUserProfileOpen);
 
   const menuItems = [
-    { icon: <Home />, label: "Offers", value: "offers" },
-    { icon: <BarChart />, label: "Update CV", value: "update-cv" },
-    { icon: <FileCheck2 />, label: "Convocation", value: "convo" },
+    { icon: <Home />, label: "Ajout Offre", value: "ajouter-offre" },
+    { icon: <BarChart />, label: "Gestion Candidature", value: "candidature" },
+    { icon: <FileCheck2 />, label: "Entretien", value: "entretien" },
+    { icon: <FileCheck2 />, label: "Stagaires", value: "stagaire" },
   ];
 
   return (
@@ -97,11 +103,12 @@ const Dashboard = () => {
             className="flex items-center space-x-2 text-gray-400 hover:text-white"
           >
             {user.picture && (
-              <img
-                src={user.picture}
+              <div
                 alt={user.name}
-                className="w-8 h-8 rounded-full"
-              />
+                className="w-8 h-8 rounded-full bg-slate-300 text-black text-center flex items-center justify-center"
+              >
+                {user.picture}
+              </div>
             )}
             <span
               className={`transition-opacity duration-300 ${
@@ -117,11 +124,13 @@ const Dashboard = () => {
           {isUserProfileOpen && (
             <div className=" edit-profile-div absolute bottom-14 right-4 bg-gray-800 text-white p-4 border border-gray-700">
               <ul>
-                <li className="py-2 hover:bg-gray-700">
-                  <a href="#">View Profile</a>
-                </li>
-                <li className="py-2 hover:bg-gray-700">
-                  <a href="#">Edit Profile</a>
+                <li
+                  onClick={() => {
+                    localStorage.removeItem("authToken");
+                    window.location.href = "/";
+                  }}
+                >
+                  <LogOut style={{ cursor: "pointer" }}></LogOut>
                 </li>
               </ul>
             </div>

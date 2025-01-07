@@ -1,66 +1,152 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { Toast } from "@/components/ui/Toast";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import ConfirmDialog from "@/components/ui/ConfirmDialog"; // Import the ConfirmDialog component
 
-const Offer = ({ offer }) => {
+const Comptes = () => {
+  const [users, setUsers] = useState([]);
+  const [filter, setFilter] = useState(""); // Filter for "ecole" or "entreprise"
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    userId: null,
+    userType: "",
+  });
+  const { toasts, showToast } = useToast();
+  const API_BASE_URL = "http://localhost:3000/api/admins";
+
+  const fetchConfirmedUsers = async () => {
+    const response = await axios.get(`${API_BASE_URL}/confirmed-users`);
+    return response.data;
+  };
+
+  const deleteUser = async (id, type) => {
+    await axios.delete(`${API_BASE_URL}/delete-user/${id}/${type}`);
+  };
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const data = await fetchConfirmedUsers();
+        setUsers(data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        showToast("Failed to load users.", "error");
+      }
+    };
+
+    loadUsers();
+  }, []);
+
+  const handleDelete = async () => {
+    try {
+      await deleteUser(confirmDialog.userId, confirmDialog.userType);
+      setUsers((prev) =>
+        prev.filter(
+          (user) =>
+            user.id !== confirmDialog.userId ||
+            user.type !== confirmDialog.userType
+        )
+      );
+      showToast("User deleted successfully.", "success");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      showToast("Failed to delete user.", "error");
+    } finally {
+      setConfirmDialog({ isOpen: false, userId: null, userType: "" });
+    }
+  };
+
+  const filteredUsers =
+    filter === "" ? users : users.filter((user) => user.type === filter);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-      whileHover={{ scale: 1.02 }}
-      className="relative bg-white shadow-lg rounded-lg overflow-hidden transform  hover:shadow-2xl "
-    >
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[#4F46E5] to-[#6366F1] p-5 text-white">
-        <h2 className="text-2xl font-bold">{offer.title}</h2>
-        <p className="text-sm opacity-90">{offer.organization}</p>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Comptes Confirmés</h1>
+
+      {/* Filter */}
+      <div className="flex justify-end mb-4">
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="border rounded-lg p-2"
+        >
+          <option value="">Tous</option>
+          <option value="ecole">Responsable Ecole</option>
+          <option value="entreprise">Responsable Entreprise</option>
+        </select>
       </div>
 
-      {/* Body */}
-      <div className="p-6">
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-3">
-          <span className="text-xs bg-[#ECFDF5] text-[#10B981] py-1 px-3 rounded-full">
-            {offer.type}
-          </span>
-          {offer.remote && (
-            <span className="text-xs bg-[#EFF6FF] text-[#3B82F6] py-1 px-3 rounded-full">
-              Remote
-            </span>
-          )}
-        </div>
-
-        {/* Description */}
-        <p className="text-gray-600 mb-4 leading-relaxed">
-          {offer.description}
-        </p>
-
-        {/* Skills */}
-        <h3 className="text-md font-semibold text-gray-800 mb-2">
-          Requirements
-        </h3>
-        <ul className="flex flex-wrap gap-2 mb-4">
-          {offer.skills.map((skill) => (
-            <li
-              key={skill}
-              className="text-xs bg-[#F3F4F6] text-[#374151] py-1 px-3 rounded-full"
-            >
-              {skill}
-            </li>
+      {/* Table */}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Nom</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Téléphone</TableHead>
+            <TableHead>Institution</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredUsers.map((user) => (
+            <TableRow key={user.id}>
+              <TableCell>
+                {user.nom} {user.prenom}
+              </TableCell>
+              <TableCell>{user.email}</TableCell>
+              <TableCell>{user.telephone}</TableCell>
+              <TableCell>{user.institution}</TableCell>
+              <TableCell>{user.type}</TableCell>
+              <TableCell>
+                <button
+                  onClick={() =>
+                    setConfirmDialog({
+                      isOpen: true,
+                      userId: user.id,
+                      userType: user.type,
+                    })
+                  }
+                  className="text-red-600 hover:underline"
+                >
+                  Supprimer
+                </button>
+              </TableCell>
+            </TableRow>
           ))}
-        </ul>
+        </TableBody>
+      </Table>
 
-        {/* Footer */}
-        <div className="flex justify-between items-center">
-          <button className="relative group bg-[#4F46E5] text-white py-2 px-6 rounded-lg font-semibold hover:bg-[#4338CA] duration-300">
-            Apply Now
-            <span className="absolute inset-0 bg-[#8B5CF6] rounded-lg opacity-0 group-hover:opacity-20  duration-300"></span>
-          </button>
-          <p className="text-sm text-gray-500">{offer.postedAt}</p>
-        </div>
-      </div>
-    </motion.div>
+      {/* Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        message="Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible."
+        onConfirm={handleDelete}
+        onCancel={() =>
+          setConfirmDialog({ isOpen: false, userId: null, userType: "" })
+        }
+      />
+
+      {/* Toast Notifications */}
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => showToast("", "")}
+        />
+      ))}
+    </div>
   );
 };
 
-export default Offer;
+export default Comptes;

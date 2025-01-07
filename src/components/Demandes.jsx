@@ -11,6 +11,7 @@ const DemandesPage = () => {
         const response = await axios.get(
           "http://localhost:3000/api/admins/demandes"
         );
+        console.log("Demandes:", response.data);
         setDemandes(response.data);
       } catch (error) {
         console.error("Error fetching demandes:", error);
@@ -20,13 +21,27 @@ const DemandesPage = () => {
     fetchDemandes();
   }, []);
 
-  const handleConfirm = async (demandeId) => {
+  const handleConfirm = async (id, type) => {
+    console.log("Confirming demande:", id, type);
     try {
-      await axios.post(`/api/demandes/confirm/${demandeId}`);
-      // Refresh demandes after confirmation
-      setDemandes((prev) => prev.filter((d) => d.id !== demandeId));
+      await axios.post(
+        `http://localhost:3000/api/admins/confirm-demande/${id}/${type}`
+      );
+      setDemandes((prev) => prev.filter((d) => d.id !== id || d.type !== type));
     } catch (error) {
       console.error("Error confirming demande:", error);
+    }
+  };
+  const handleRemove = async (id, type) => {
+    console.log("Removing demande:", id, type);
+    try {
+      await axios.delete(
+        `http://localhost:3000/api/admins/remove-demande/${id}/${type}`
+      );
+      // Remove the demande from the state
+      setDemandes((prev) => prev.filter((d) => d.id !== id || d.type !== type));
+    } catch (error) {
+      console.error("Error removing demande:", error);
     }
   };
 
@@ -39,6 +54,7 @@ const DemandesPage = () => {
             key={demande.id}
             demande={demande}
             onConfirm={handleConfirm}
+            onRemove={handleRemove}
           />
         ))}
       </div>

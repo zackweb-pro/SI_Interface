@@ -8,18 +8,19 @@ import {
   Menu,
   LayoutDashboard,
   FileCheck2,
+  LogOut,
 } from "lucide-react";
 
 import profile from "@/assets/images/profile.png";
 import Demandes from "@/components/Demandes";
-import StartsADmin from "@/components/StartsADmin";
+import StatsAdmin from "@/components/StatsAdmin";
 import Comptes from "@/components/Comptes";
 import decodeJWT from "@/components/DecodeJWT";
 // import react from '@/assets/react.png';
 
 const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(true);
-  const [activeSection, setActiveSection] = useState("offers");
+  const [activeSection, setActiveSection] = useState("stats-admin");
   const [isUserProfileOpen, setIsUserProfileOpen] = useState(false);
   const { nom, prenom, email, id, role } = decodeJWT(
     localStorage.getItem("authToken")
@@ -34,8 +35,8 @@ const Dashboard = () => {
   const toggleUserProfile = () => setIsUserProfileOpen(!isUserProfileOpen);
 
   const menuItems = [
-    { icon: <Home />, label: "Demandes", value: "demandes" },
     { icon: <BarChart />, label: "Statistique", value: "stats-admin" },
+    { icon: <Home />, label: "Demandes", value: "demandes" },
     { icon: <FileCheck2 />, label: "Comptes", value: "comptes" },
   ];
 
@@ -118,19 +119,21 @@ const Dashboard = () => {
               <span className="text-sm">{user.email}</span>
             </span>
           </button>
-          {/* 
+
           {isUserProfileOpen && (
             <div className=" edit-profile-div absolute bottom-14 right-4 bg-gray-800 text-white p-4 border border-gray-700">
               <ul>
-                <li className="py-2 hover:bg-gray-700">
-                  <a href="#">View Profile</a>
-                </li>
-                <li className="py-2 hover:bg-gray-700">
-                  <a href="#">Edit Profile</a>
+                <li
+                  onClick={() => {
+                    localStorage.removeItem("authToken");
+                    window.location.href = "/";
+                  }}
+                >
+                  <LogOut style={{ cursor: "pointer" }}></LogOut>
                 </li>
               </ul>
             </div>
-          )} */}
+          )}
         </div>
       </div>
 
@@ -143,8 +146,9 @@ const Dashboard = () => {
         transition={{ duration: 0.3 }}
         className="flex-1 bg-gray-100 p-6"
       >
+        {activeSection === "stats-admin" && <StatsAdmin />}
+
         {activeSection === "demandes" && <Demandes />}
-        {activeSection === "stats-admin" && <StartsADmin />}
         {activeSection === "comptes" && <Comptes />}
       </motion.div>
     </div>

@@ -1,4 +1,5 @@
 const getConnection = require("../config/dbConfig");
+const { sendEmail } = require("../utils/sendMail");
 
 // Get all admins
 async function getAllAdmins(req, res) {
@@ -76,7 +77,7 @@ const getDemandes = async (req, res) => {
       ) i ON r.institution_id = i.id
     `;
     const result = await connection.execute(query);
-
+    console.log("Demandes:", result.rows);
     const demandes = result.rows.map((row) => ({
       id: row[0],
       nom: row[1],
@@ -101,44 +102,189 @@ const getDemandes = async (req, res) => {
 
 
 const confirmDemande = async (req, res) => {
-  const { id } = req.params;
+  const { id, type } = req.params;
 
   try {
     const connection = await getConnection();
 
-    // Confirm the user
-    const updateQuery = `
-      UPDATE Respo_Ecole SET isconfirmed = 1 WHERE id = :id
-      UNION ALL
-      UPDATE Respo_Entreprise SET isconfirmed = 1 WHERE id = :id
-    `;
-    await connection.execute(updateQuery, { id }, { autoCommit: true });
+    // Validate the type
+    if (!["ecole", "entreprise"].includes(type)) {
+      return res.status(400).json({ error: "Invalid type specified." });
+    }
 
-    // Fetch the email and password to send
+    // Determine the table based on the type
+    const table = type === "ecole" ? "Respo_Ecole" : "Respo_Entreprise";
+
+    // Update `isconfirmed` in the specified table
+    const updateQuery = `
+      UPDATE ${table} 
+      SET isconfirmed = 1
+      WHERE id = :id AND isconfirmed = 0
+    `;
+    const updateResult = await connection.execute(updateQuery, { id }, { autoCommit: true });
+    console.log("Update result:", updateResult);
+    if (updateResult.rowsAffected === 0) {
+      return res.status(404).json({ error: "Demande not found or already confirmed." });
+    }
+
+    // Fetch user email and password
     const userQuery = `
-      SELECT email, password FROM (
-        SELECT email, password FROM Respo_Ecole WHERE id = :id
-        UNION ALL
-        SELECT email, password FROM Respo_Entreprise WHERE id = :id
-      )
+      SELECT email, password 
+      FROM ${table} 
+      WHERE id = :id
     `;
     const result = await connection.execute(userQuery, { id });
     const user = result.rows[0];
 
-    // Send email (use nodemailer)
-    sendEmail(user[0], "Account Confirmation", `Your account has been confirmed. Your password is ${user[1]}.`);
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
 
-    res.status(200).json({ message: "Demande confirmed successfully" });
+    const userEmail = user[0];
+    const userPassword = user[1];
+
+    // Send confirmation email
+    await sendEmail(
+      userEmail,
+      "Account Confirmation",
+      `Your account has been confirmed. Your login credentials are:
+      Email: ${userEmail}
+      Password: ${userPassword}`
+    );
+
+    res.status(200).json({ message: "Demande confirmed successfully and email sent." });
   } catch (error) {
     console.error("Error confirming demande:", error);
-    res.status(500).json({ error: "Failed to confirm demande" });
+    res.status(500).json({ error: "Failed to confirm demande." });
   }
 };
 
 
+const removeDemande = async (req, res) => {
+  const { id, type } = req.params;
+
+  try {
+    const connection = await getConnection();
+
+    // Validate the type
+    if (!["ecole", "entreprise"].includes(type)) {
+      return res.status(400).json({ error: "Invalid type specified." });
+    }
+
+    // Determine the table based on the type
+    const table = type === "ecole" ? "Respo_Ecole" : "Respo_Entreprise";
+
+    // Delete the demande from the specified table
+    const deleteQuery = `
+      DELETE FROM ${table} 
+      WHERE id = :id AND isconfirmed = 0
+    `;
+    const deleteResult = await connection.execute(deleteQuery, { id }, { autoCommit: true });
+
+    if (deleteResult.rowsAffected === 0) {
+      return res.status(404).json({ error: "Demande not found or already confirmed." });
+    }
+
+    res.status(200).json({ message: "Demande removed successfully." });
+  } catch (error) {
+    console.error("Error removing demande:", error);
+    res.status(500).json({ error: "Failed to remove demande." });
+  }
+};
+
+
+const getConfirmedUsers = async (req, res) => {
+  try {
+    const connection = await getConnection();
+
+    // Step 1: Fetch Respo_Ecole users
+    const respoEcoleQuery = `
+      SELECT 
+        r.id, r.nom, r.prenom, r.email, r.telephone, 
+        'ecole' AS type, e.name AS institution_name
+      FROM Respo_Ecole r
+      JOIN Ecole e ON r.ecole_id = e.id
+      WHERE r.isconfirmed = 1
+    `;
+    const respoEcoleResult = await connection.execute(respoEcoleQuery);
+    const respoEcoleUsers = respoEcoleResult.rows.map((row) => ({
+      id: row[0],
+      nom: row[1],
+      prenom: row[2],
+      email: row[3],
+      telephone: row[4],
+      type: row[5],
+      institution: row[6],
+    }));
+
+    // Step 2: Fetch Respo_Entreprise users
+    const respoEntrepriseQuery = `
+      SELECT 
+        r.id, r.nom, r.prenom, r.email, r.telephone, 
+        'entreprise' AS type, e.name AS institution_name
+      FROM Respo_Entreprise r
+      JOIN Entreprise e ON r.entreprise_id = e.id
+      WHERE r.isconfirmed = 1
+    `;
+    const respoEntrepriseResult = await connection.execute(respoEntrepriseQuery);
+    const respoEntrepriseUsers = respoEntrepriseResult.rows.map((row) => ({
+      id: row[0],
+      nom: row[1],
+      prenom: row[2],
+      email: row[3],
+      telephone: row[4],
+      type: row[5],
+      institution: row[6],
+    }));
+
+    // Step 3: Combine the two lists
+    const confirmedUsers = [...respoEcoleUsers, ...respoEntrepriseUsers];
+
+    // Step 4: Sort the combined list by type and name
+    confirmedUsers.sort((a, b) => {
+      if (a.type === b.type) {
+        return a.nom.localeCompare(b.nom);
+      }
+      return a.type.localeCompare(b.type);
+    });
+
+    res.status(200).json(confirmedUsers);
+  } catch (error) {
+    console.error("Error fetching confirmed users:", error);
+    res.status(500).json({ error: "Failed to fetch confirmed users" });
+  }
+};
+
+
+const deleteUser = async (req, res) => {
+  const { id, type } = req.params;
+
+  try {
+    const connection = await getConnection();
+
+    let deleteQuery = "";
+    if (type === "ecole") {
+      deleteQuery = "DELETE FROM Respo_Ecole WHERE id = :id";
+    } else if (type === "entreprise") {
+      deleteQuery = "DELETE FROM Respo_Entreprise WHERE id = :id";
+    } else {
+      return res.status(400).json({ error: "Invalid type" });
+    }
+
+    await connection.execute(deleteQuery, { id }, { autoCommit: true });
+
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Failed to delete user" });
+  }
+};
 module.exports = {
   getAllAdmins,
   createAdmin,
   getDemandes,
   confirmDemande,
+  removeDemande,
+  deleteUser,
+  getConfirmedUsers,
 };
