@@ -16,6 +16,7 @@ import Demandes from "@/components/Demandes";
 import StatsAdmin from "@/components/StatsAdmin";
 import Comptes from "@/components/Comptes";
 import decodeJWT from "@/components/DecodeJWT";
+
 // import react from '@/assets/react.png';
 
 const Dashboard = () => {
@@ -44,7 +45,7 @@ const Dashboard = () => {
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <div
-        className={` sidebar-menu bg-gray-900 text-white h-screen transition-all duration-300 ${
+        className={` sidebar-menu bg-white text-gray-700 h-screen transition-all duration-300 ${
           isOpen ? "w-72" : "w-16"
         }`}
       >
@@ -52,7 +53,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
           <button
             onClick={toggleSidebar}
-            className="text-white hover:text-gray-400 focus:outline-none"
+            className="text-gray-700 hover:text-gray-900 focus:outline-none"
           >
             <LayoutDashboard />
           </button>
@@ -66,14 +67,14 @@ const Dashboard = () => {
                 onClick={() => setActiveSection(item.value)}
                 className={`flex items-center w-full px-4 py-2 rounded-lg transition-all ${
                   activeSection === item.value
-                    ? "bg-gray-800 text-white"
-                    : "hover:bg-gray-700 text-gray-400"
+                    ? "bg-blue-100 text-gray-900 border-r-2 border-blue-500"
+                    : "hover:bg-blue-100 text-gray-900"
                 }`}
               >
                 <span
                   className={`group-hover:text-white ${
                     activeSection === item.value
-                      ? "text-white"
+                      ? "text-blue-500"
                       : "text-gray-400"
                   }`}
                 >

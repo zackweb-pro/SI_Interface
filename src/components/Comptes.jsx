@@ -10,6 +10,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import ConfirmDialog from "@/components/ui/ConfirmDialog"; // Import the ConfirmDialog component
 
 const Comptes = () => {
@@ -66,7 +74,7 @@ const Comptes = () => {
   };
 
   const filteredUsers =
-    filter === "" ? users : users.filter((user) => user.type === filter);
+    filter === null ? users : users.filter((user) => user.type === filter);
 
   return (
     <div className="p-6">
@@ -74,7 +82,24 @@ const Comptes = () => {
 
       {/* Filter */}
       <div className="flex justify-end mb-4">
-        <select
+        <Select>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue
+              placeholder="Type de comptes" // value={filter}
+              onChange={(e) => {
+                setFilter(e.target.value);
+                console.log("select value: ", e.target.value);
+              }}
+            />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={null}>Tous</SelectItem>
+            <SelectItem value="ecole">Responsable Ecole</SelectItem>
+            <SelectItem value="entreprise">Responsable Entreprise</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           className="border rounded-lg p-2"
@@ -82,7 +107,7 @@ const Comptes = () => {
           <option value="">Tous</option>
           <option value="ecole">Responsable Ecole</option>
           <option value="entreprise">Responsable Entreprise</option>
-        </select>
+        </select>*/}
       </div>
 
       {/* Table */}
