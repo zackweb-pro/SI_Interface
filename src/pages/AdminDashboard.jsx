@@ -65,17 +65,17 @@ const Dashboard = () => {
             <li key={item.value} className="group">
               <button
                 onClick={() => setActiveSection(item.value)}
-                className={`flex items-center w-full px-4 py-2 rounded-lg transition-all ${
+                className={`flex items-center w-full px-4 py-2 transition-all ${
                   activeSection === item.value
-                    ? "bg-blue-100 text-gray-900 border-r-2 border-blue-500"
-                    : "hover:bg-blue-100 text-gray-900"
+                    ? "bg-violet-50 text-blue-500 border-r-2 border-blue-500"
+                    : "hover:bg-blue-50 text-gray-900"
                 }`}
               >
                 <span
-                  className={`group-hover:text-white ${
+                  className={`group-hover:text-blue ${
                     activeSection === item.value
                       ? "text-blue-500"
-                      : "text-gray-400"
+                      : "text-gray-900"
                   }`}
                 >
                   {item.icon}
