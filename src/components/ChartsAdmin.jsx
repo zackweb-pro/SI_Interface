@@ -60,28 +60,33 @@ const Statistiques = ({ studentData, enterpriseData }) => {
     <div
       className="p-6"
       style={{
-        maxWidth: "800px",
         margin: "0 auto",
-        // textAlign: "center",
-        // display: "flex",
-        // flexDirection: "column",
-        // gap: "2rem",
-        // // flexWrap: "wrap",
-        // justifyContent: "center",
-        // alignItems: "center",
-        // minHeight: "90vh",
+        width: "100%",
+        textAlign: "center",
+        display: "flex",
+        flexDirection: "column",
+        gap: "2rem",
+        // flexWrap: "wrap",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "90vh",
       }}
     >
       <h1 className="text-2xl font-bold mb-6">Statistiques</h1>
 
       {/* Horizontal Bar Chart */}
-      <div className="mb-8" style={{ maxWidth: "500px" }}>
+      <div
+        className="mb-8"
+        style={{
+          maxWidth: "700px",
+        }}
+      >
         <h2 className="text-lg font-semibold mb-4">Internships by Company</h2>
         <Bar data={horizontalBarData} options={horizontalBarOptions} />
       </div>
 
       {/* Pie Chart */}
-      <div className="mb-8" style={{ maxWidth: "400px" }}>
+      <div className="mb-8" style={{ maxWidth: "700px" }}>
         <h2 className="text-lg font-semibold mb-4">Internship Success Rate</h2>
         <Pie data={pieChartData} />
       </div>
