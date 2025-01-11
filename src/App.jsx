@@ -8,8 +8,11 @@ import RECDashboard from "./pages/RECDashboard";
 import RENDashboard from "./pages/RENDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import StatsAdmin from "./pages/StatsAdmin";
-import Demandes from "./components/Demandes";
-import Comptes from "./components/Comptes";
+import Demandes from "./pages/Demandes";
+import Comptes from "./pages/Comptes";
+import AjoutOffre from "./pages/AjoutOffre";
+import Candidatures from "./pages/candidatures";
+import Entretiens from "./pages/Entretiens";
 
 const App = () => {
   return (
@@ -24,6 +27,10 @@ const App = () => {
       <Route path="/admin-dashboard/stats-admin" element={<StatsAdmin />} />
       <Route path="/admin-dashboard/demandes" element={<Demandes />} />
       <Route path="/admin-dashboard/comptes" element={<Comptes />} />
+
+      <Route path="/ajouter-offre" element={<AjoutOffre />} />
+      <Route path="/candidatures" element={<Candidatures />} />
+      <Route path="/entretiens" element={<Entretiens />} />
     </Routes>
   );
 };

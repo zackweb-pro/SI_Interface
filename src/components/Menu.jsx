@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import EditProfileDialog from "@/components/EditProfile";
 
-const Menu = ({ user, onLogout, children, items }) => {
+const Menu = ({ user, onLogout, children, items, role }) => {
   const [isOpen, setIsOpen] = useState(true);
   const { pathname } = useLocation();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -49,7 +49,7 @@ const Menu = ({ user, onLogout, children, items }) => {
         {/* Sidebar Header */}
         <SidebarHeader>
           <div className="p-4 text-lg font-bold text-gray-900">
-            Dashboard Admin
+            Dashboard {role ? role : ""}
           </div>
         </SidebarHeader>
 

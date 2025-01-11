@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import Demande from "./Demande";
+import Demande from "../components/Demande";
 import axios from "axios";
+import { BarChart, Home, FileCheck2, Menu, Sidebar } from "lucide-react";
+import SidebarMenu from "../components/Menu";
+import decodeJWT from "../components/DecodeJWT";
+
 const DemandesPage = () => {
   const [demandes, setDemandes] = useState([]);
 
@@ -45,20 +49,50 @@ const DemandesPage = () => {
     }
   };
 
+  const { nom, prenom, email } = decodeJWT(
+    localStorage.getItem("authToken")
+  ).payload;
+
+  const user = {
+    nom: nom,
+    prenom: prenom,
+    name: `${nom} ${prenom}`,
+    email: email,
+    picture: nom.substr(0, 2).toUpperCase(),
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    window.location.href = "/";
+  };
+  const items = [
+    {
+      label: "Statistique",
+      path: "/admin-dashboard/stats-admin",
+      icon: BarChart,
+    },
+    { label: "Demandes", path: "/admin-dashboard/demandes", icon: Home },
+    { label: "Comptes", path: "/admin-dashboard/comptes", icon: FileCheck2 },
+  ];
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Demandes</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {demandes.map((demande) => (
-          <Demande
-            key={demande.id}
-            demande={demande}
-            onConfirm={handleConfirm}
-            onRemove={handleRemove}
-          />
-        ))}
-      </div>
-    </div>
+    <SidebarMenu
+      user={user}
+      onLogout={handleLogout}
+      items={items}
+      children={
+        <div className="p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {demandes.map((demande) => (
+              <Demande
+                key={demande.id}
+                demande={demande}
+                onConfirm={handleConfirm}
+                onRemove={handleRemove}
+              />
+            ))}
+          </div>
+        </div>
+      }
+    />
   );
 };
 

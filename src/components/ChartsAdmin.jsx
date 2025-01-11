@@ -72,8 +72,6 @@ const Statistiques = ({ studentData, enterpriseData }) => {
         minHeight: "90vh",
       }}
     >
-      <h1 className="text-2xl font-bold mb-6">Statistiques</h1>
-
       {/* Horizontal Bar Chart */}
       <div
         className="mb-8"

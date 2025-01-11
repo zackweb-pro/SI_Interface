@@ -111,6 +111,7 @@ export default function UpdateCV() {
     doc.text("CV", 10, 10);
     doc.save("CV.pdf");
   };
+  const onsave = () => {};
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Your CV</h1>
@@ -126,6 +127,7 @@ export default function UpdateCV() {
         setPersonalData={setPersonalData}
         sections={sections}
         setSections={setSections}
+        onsave={onsave}
       />
     </div>
   );
