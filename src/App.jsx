@@ -1,8 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import StudentEspace from "@/pages/StudentEspace";
-import Offers from "./components/Offers";
-import UpdateCV from "./components/UpdateCV";
+import Offers from "./pages/Offers";
+import UpdateCV from "./pages/UpdateCV";
 import Sign from "./pages/Sign";
 import RECDashboard from "./pages/RECDashboard";
 import RENDashboard from "./pages/RENDashboard";
@@ -13,6 +13,11 @@ import Comptes from "./pages/Comptes";
 import AjoutOffre from "./pages/AjoutOffre";
 import Candidatures from "./pages/candidatures";
 import Entretiens from "./pages/Entretiens";
+import Convocation from "./pages/PageDesConvo";
+import AjoutEtudiant from "./pages/AjoutEtudiant";
+import ConventionTemplate from "./pages/ConventionTemplate";
+import Etudiants from "./pages/Etudiants";
+import SelectionnerEntreprise from "./pages/SelectionnerEntreprise";
 
 const App = () => {
   return (
@@ -31,6 +36,18 @@ const App = () => {
       <Route path="/ajouter-offre" element={<AjoutOffre />} />
       <Route path="/candidatures" element={<Candidatures />} />
       <Route path="/entretiens" element={<Entretiens />} />
+
+      <Route path="/offers" element={<Offers />} />
+      <Route path="/update-cv" element={<UpdateCV />} />
+      <Route path="/convo" element={<Convocation />} />
+
+      {/* Add more routes here... */}
+      <Route path="/ajouter-etudiant" element={<AjoutEtudiant />} />
+      <Route path="/convention-template" element={<ConventionTemplate />} />
+      <Route path="/etudiants" element={<Etudiants />} />
+      <Route path="/select-entreprise" element={<SelectionnerEntreprise />} />
+
+      <Route path="*" element={<h1>404 - Not Found</h1>} />
     </Routes>
   );
 };

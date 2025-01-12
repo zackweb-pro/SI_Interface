@@ -1,11 +1,21 @@
 import React, { useState } from "react";
 import CV from "react-cv";
 import { jsPDF } from "jspdf";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import profile from "../assets/images/profile.png";
-import { Toggle } from "./ui/toggle";
-import CVEditor from "./ManageCV";
 
+import profile from "../assets/images/profile.png";
+import CVEditor from "../components/ManageCV";
+import { useEffect } from "react";
+import {
+  Home,
+  BarChart,
+  FileCheck2,
+  Download,
+  MailWarningIcon,
+} from "lucide-react";
+import SidebarMenu from "@/components/Menu";
+import { Button } from "@/components/ui/button";
+// import react from '@/assets/react.png';
+import decodeJWT from "@/components/DecodeJWT";
 export default function UpdateCV() {
   const [personalData, setPersonalData] = useState({
     name: "Zakaria OUMGAHR",
@@ -20,6 +30,36 @@ export default function UpdateCV() {
       { type: "github", value: "github.com/zackweb-pro" },
     ],
   });
+  const { nom, prenom, email, id, role } = decodeJWT(
+    localStorage.getItem("authToken")
+  ).payload;
+  const user = {
+    nom: nom,
+    prenom: prenom,
+    name: nom + " " + prenom,
+    email: email,
+    picture: nom.substr(0, 2).toUpperCase(),
+  };
+
+  const menuItems = [
+    { icon: Home, label: "Offers", value: "offers", path: "/offers" },
+    {
+      icon: BarChart,
+      label: "CV",
+      value: "update-cv",
+      path: "/update-cv",
+    },
+    {
+      icon: FileCheck2,
+      label: "Convocation",
+      value: "convo",
+      path: "/convo",
+    },
+  ];
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    window.location.href = "/";
+  };
 
   const [sections, setSections] = useState({
     career: {
@@ -111,24 +151,75 @@ export default function UpdateCV() {
     doc.text("CV", 10, 10);
     doc.save("CV.pdf");
   };
-  const onsave = () => {};
-  return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Your CV</h1>
-      <CV
-        personalData={personalData}
-        sections={Object.values(sections)}
-        branding={false}
-      />
-      <button onClick={generatePDF}>Download PDF</button>
+  const onsave = async () => {
+    const userId = localStorage.getItem("user_id"); // Assuming user_id is stored in localStorage
+    const data = { personalData, sections, userId };
 
-      <CVEditor
-        personalData={personalData}
-        setPersonalData={setPersonalData}
-        sections={sections}
-        setSections={setSections}
-        onsave={onsave}
-      />
-    </div>
+    try {
+      const response = await fetch("http://localhost:3000/api/cv", {
+        method: "POST", // Or "PUT" if updating
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        alert("CV saved successfully!");
+      } else {
+        alert("Failed to save CV!");
+      }
+    } catch (error) {
+      console.error("Error saving CV:", error);
+      alert("An error occurred!");
+    }
+  };
+  useEffect(() => {
+    // Fetch CV data on component mount
+    const fetchCV = async () => {
+      const userId = localStorage.getItem("user_id");
+      try {
+        const response = await fetch(`http://localhost:5000/api/cv/${userId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setPersonalData(data.personalData);
+          setSections(data.sections);
+        }
+      } catch (error) {
+        console.error("Error fetching CV:", error);
+      }
+    };
+
+    fetchCV();
+  }, []);
+  return (
+    <SidebarMenu
+      role={"Etudiant"}
+      user={user}
+      items={menuItems}
+      onLogout={handleLogout}
+      children={
+        <div className="p-6">
+          <CV
+            personalData={personalData}
+            sections={Object.values(sections)}
+            branding={false}
+          />
+          <Button
+            onClick={generatePDF}
+            style={{ display: "flex", margin: "auto" }}
+          >
+            <Download></Download>
+            Download PDF
+          </Button>
+
+          <CVEditor
+            personalData={personalData}
+            setPersonalData={setPersonalData}
+            sections={sections}
+            setSections={setSections}
+            onsave={onsave}
+          />
+        </div>
+      }
+    />
   );
 }

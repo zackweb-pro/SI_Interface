@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 
 const Demande = ({ demande, onConfirm, onRemove }) => {
+  console.log("Demande:", demande);
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -22,13 +23,13 @@ const Demande = ({ demande, onConfirm, onRemove }) => {
       <div className="p-6">
         {/* Institution Details */}
         <div className="mb-3">
-          <h3 className="text-md font-semibold text-gray-800">Institution</h3>
+          <h3 className="text-md font-semibold text-gray-800">Organisation</h3>
           <p className="text-gray-600">
             <span className="font-bold">{demande.institution.nom}</span> -{" "}
             {demande.type === "ecole" ? "Ecole" : "Entreprise"}
           </p>
           <p className="text-gray-600 text-sm">
-            <strong> Contact:</strong> {demande.institution.contact_email} |{" "}
+            <strong>Contact:</strong> {demande.institution.contact_email} |{" "}
             {demande.institution.contact_telephone}
           </p>
         </div>

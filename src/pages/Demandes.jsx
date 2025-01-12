@@ -83,7 +83,7 @@ const DemandesPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {demandes.map((demande) => (
               <Demande
-                key={demande.id}
+                key={demande.type + demande.id}
                 demande={demande}
                 onConfirm={handleConfirm}
                 onRemove={handleRemove}

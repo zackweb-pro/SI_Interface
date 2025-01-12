@@ -6,7 +6,7 @@ const oracledb = require("oracledb");
 exports.getEcoles = async (req, res) => {
   try {
     const connection = await getConnection();
-    const query = "SELECT id, name, domaine, telephone, email FROM Ecole";
+    const query = "SELECT id, name, domaine, telephone, email, adresse FROM Ecole";
     const result = await connection.execute(query);
     res.status(200).json(result.rows);
   } catch (error) {
@@ -19,7 +19,7 @@ exports.getEcoles = async (req, res) => {
 exports.getEntreprises = async (req, res) => {
   try {
     const connection = await getConnection();
-    const query = "SELECT id, name, secteur, telephone, email FROM Entreprise";
+    const query = "SELECT id, name, secteur, telephone, email, adresse FROM Entreprise";
     const result = await connection.execute(query);
     res.status(200).json(result.rows);
   } catch (error) {
@@ -41,6 +41,7 @@ exports.createRespoEcole = async (req, res) => {
     roleOrField,
     contactPhone,
     contactEmail,
+    adresse,
     institution_id, // This is the ID of the selected institution (if applicable)
   } = req.body;
 
@@ -54,11 +55,10 @@ exports.createRespoEcole = async (req, res) => {
     let ecoleId = institution_id;
 
     if (!institution_id) {
-      // Insert the new school and get its ID
+      // Insert the new school without specifying the ID (trigger will handle it)
       const insertEcoleQuery = `
-        INSERT INTO Ecole (name, domaine, telephone, email)
-        VALUES (:companyOrSchoolName, :roleOrField, :contactPhone, :contactEmail)
-        RETURNING id INTO :id
+        INSERT INTO Ecole (name, domaine, telephone, email, adresse)
+        VALUES (:companyOrSchoolName, :roleOrField, :contactPhone, :contactEmail, :adresse)
       `;
       const result = await connection.execute(
         insertEcoleQuery,
@@ -67,12 +67,22 @@ exports.createRespoEcole = async (req, res) => {
           roleOrField,
           contactPhone,
           contactEmail,
-          id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT },
+          adresse,
         },
         { autoCommit: true }
       );
 
-      ecoleId = result.outBinds.id[0]; // Get the generated ID for the new school
+      // Fetch the auto-generated ID for the new school
+      const fetchEcoleIdQuery = `SELECT id FROM Ecole WHERE name = :name AND email = :email AND telephone = :telephone`;
+      const fetchResult = await connection.execute(
+        fetchEcoleIdQuery,
+        {
+          name: companyOrSchoolName,
+          email: contactEmail,
+          telephone: contactPhone,
+        }
+      );
+      ecoleId = fetchResult.rows[0][0]; // Get the generated ID from the query result
     }
 
     // Insert the Respo_Ecole
@@ -107,6 +117,7 @@ exports.createRespoEntreprise = async (req, res) => {
     roleOrField,
     contactPhone,
     contactEmail,
+    adresse,
     institution_id, // This is the ID of the selected institution (if applicable)
   } = req.body;
 
@@ -120,25 +131,36 @@ exports.createRespoEntreprise = async (req, res) => {
     let entrepriseId = institution_id;
 
     if (!institution_id) {
-      // Insert the new company and get its ID
+      // Insert the new company without specifying the ID (trigger will handle it)
       const insertEntrepriseQuery = `
-        INSERT INTO Entreprise (name, secteur, telephone, email)
-        VALUES (:companyOrSchoolName, :roleOrField, :contactPhone, :contactEmail)
-        RETURNING id INTO :id
+        INSERT INTO Entreprise (name, secteur, telephone, email, adresse)
+        VALUES (:companyOrSchoolName, :roleOrField, :contactPhone, :contactEmail, :adresse)
       `;
-      const result = await connection.execute(
+      await connection.execute(
         insertEntrepriseQuery,
         {
           companyOrSchoolName,
           roleOrField,
           contactPhone,
           contactEmail,
-          id: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT },
+          adresse,
         },
         { autoCommit: true }
       );
 
-      entrepriseId = result.outBinds.id[0]; // Get the generated ID for the new company
+      // Fetch the auto-generated ID for the new company
+      const fetchEntrepriseIdQuery = `
+        SELECT id FROM Entreprise WHERE name = :name AND email = :email AND telephone = :telephone
+      `;
+      const fetchResult = await connection.execute(
+        fetchEntrepriseIdQuery,
+        {
+          name: companyOrSchoolName,
+          email: contactEmail,
+          telephone: contactPhone,
+        }
+      );
+      entrepriseId = fetchResult.rows[0][0]; // Get the generated ID from the query result
     }
 
     // Insert the Respo_Entreprise
@@ -161,3 +183,4 @@ exports.createRespoEntreprise = async (req, res) => {
     res.status(500).json({ error: "Failed to create Respo_Entreprise" });
   }
 };
+

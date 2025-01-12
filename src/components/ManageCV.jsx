@@ -17,6 +17,7 @@ export default function CVEditor({
   setPersonalData,
   sections,
   setSections,
+  onsave,
 }) {
   const [newSectionType, setNewSectionType] = useState(null);
 
@@ -782,6 +783,10 @@ export default function CVEditor({
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <Button variant="outline" onClick={onsave}>
+        Enregistrer
+      </Button>
     </div>
   );
 }

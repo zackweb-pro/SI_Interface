@@ -12,13 +12,8 @@ import {
   BadgePlus,
 } from "lucide-react";
 
-import Offers from "@/components/Offers";
-import UpdateCV from "@/components/UpdateCV";
-import profile from "@/assets/images/profile.png";
-import PageDesConvo from "@/components/PageDesConvo";
 import decodeJWT from "@/components/DecodeJWT";
 import SidebarMenu from "@/components/Menu";
-import AjoutOffre from "./AjoutOffre";
 
 // import react from '@/assets/react.png';
 

@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 const getConnection = require("../config/dbConfig");
 const login = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log("email:", email);
+  console.log("password:", password);
   try {
     const connection = await getConnection();
 
@@ -13,6 +14,7 @@ const login = async (req, res) => {
     const adminQuery = `SELECT id, nom, prenom, email FROM Admin WHERE email = :email AND password = :password`;
     const adminResult = await connection.execute(adminQuery, { email, password });
 
+    
     if (adminResult.rows.length > 0) {
       const admin = adminResult.rows[0];
       console.log("Admin:", admin);
@@ -61,7 +63,9 @@ const login = async (req, res) => {
       );
       return res.status(200).json({ message: "Login successful", token, user: { ...respoEntreprise, role: "respo_entreprise" } });
     }
-
+    console.log("Admin result:", adminResult.rows);
+    console.log("Respo Ecole result:", respoEcoleResult.rows);
+    console.log("Respo Entreprise result:", respoEntrepriseResult.rows);
     // If no match is found
     return res.status(401).json({ error: "Invalid credentials" });
   } catch (error) {

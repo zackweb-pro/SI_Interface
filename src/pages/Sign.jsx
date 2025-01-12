@@ -6,6 +6,15 @@ import { motion } from "framer-motion";
 import { useEffect } from "react";
 import axios from "axios";
 import decodeJWT from "../components/DecodeJWT";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function Sign() {
   const [toggle_attr, toggle_fun] = useState("");
@@ -20,6 +29,7 @@ export default function Sign() {
     roleOrField: "",
     contactPhone: "",
     contactEmail: "",
+    adresse: "",
   });
   const [institutions, setInstitutions] = useState([]);
 
@@ -66,6 +76,7 @@ export default function Sign() {
         contactPhone: selected[3],
 
         contactEmail: selected[4],
+        adresse: selected[5],
       });
     } else {
       setSelectedInstitution(null);
@@ -80,6 +91,7 @@ export default function Sign() {
         contactPhone: "",
 
         contactEmail: "",
+        adresse: "",
       });
     }
   };
@@ -121,6 +133,7 @@ export default function Sign() {
             roleOrField: formData.roleOrField,
             contactPhone: formData.contactPhone,
             contactEmail: formData.contactEmail,
+            adresse: formData.adresse,
           }),
         }
       );
@@ -183,7 +196,7 @@ export default function Sign() {
       } else if (decodedToken.payload.role === "respo_ecole") {
         window.location.href = "/respo-ecole-dashboard";
       } else if (decodedToken.payload.role === "respo_entreprise") {
-        window.location.href = "/respo-entreprise-dashboard";
+        window.location.href = "/ajouter-offre";
       }
       // alert("Login successful");
       // window.location.href = "/dashboard";
@@ -230,14 +243,14 @@ export default function Sign() {
                       alignItems: "center",
                     }}
                   >
-                    <input
+                    <Input
                       type="text"
                       placeholder="Nom"
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
                     />
-                    <input
+                    <Input
                       type="text"
                       placeholder="Prénom"
                       name="lastName"
@@ -245,14 +258,14 @@ export default function Sign() {
                       onChange={handleChange}
                     />
                   </div>
-                  <input
+                  <Input
                     type="email"
                     placeholder="Email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
                   />
-                  <input
+                  <Input
                     type="number"
                     placeholder="Téléphone"
                     name="phone"
@@ -263,7 +276,7 @@ export default function Sign() {
                 </div>
               )}
 
-              {step === 2 && (
+              {/* {step === 2 && (
                 <div>
                   <select
                     name="type"
@@ -275,7 +288,6 @@ export default function Sign() {
                     }}
                   >
                     <option value="entreprise">Entreprise</option>
-
                     <option value="ecole">École</option>
                   </select>
 
@@ -311,7 +323,7 @@ export default function Sign() {
                           alignItems: "center",
                         }}
                       >
-                        <input
+                        <Input
                           type="text"
                           placeholder={
                             formData.type === "entreprise"
@@ -322,7 +334,7 @@ export default function Sign() {
                           value={formData.companyOrSchoolName}
                           onChange={handleChange}
                         />
-                        <input
+                        <Input
                           type="text"
                           placeholder={
                             formData.type === "entreprise"
@@ -334,7 +346,7 @@ export default function Sign() {
                           onChange={handleChange}
                         />
                       </div>
-                      <input
+                      <Input
                         type="number"
                         placeholder={
                           formData.type === "entreprise"
@@ -345,7 +357,7 @@ export default function Sign() {
                         value={formData.contactPhone}
                         onChange={handleChange}
                       />
-                      <input
+                      <Input
                         type="email"
                         placeholder={
                           formData.type === "entreprise"
@@ -361,6 +373,137 @@ export default function Sign() {
                   <div className="flex justify-center gap-2.5">
                     <button onClick={handlePrev}>Back</button>
                     <button onClick={handleNext}>Next</button>
+                  </div>
+                </div>
+              )} */}
+              {step === 2 && (
+                <div>
+                  {/* Type Select */}
+                  <Select
+                    onValueChange={(value) => {
+                      handleChange({ target: { name: "type", value } });
+                      setShowAddInstitutionForm(false); // Reset the form state
+                      setSelectedInstitution(null); // Clear the institution selection
+                    }}
+                    defaultValue={formData.type || "entreprise"} // Default to "entreprise"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisissez le type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="entreprise">Entreprise</SelectItem>
+                      <SelectItem value="ecole">École</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Institution Select */}
+                  <Select
+                    onValueChange={(value) => {
+                      if (value === "new") {
+                        setSelectedInstitution(null); // Unselect the institution
+                        setShowAddInstitutionForm(true); // Show the add institution form
+                      } else {
+                        handleInstitutionSelect({ target: { value } });
+                        setShowAddInstitutionForm(false); // Hide the form
+                      }
+                    }}
+                    defaultValue={selectedInstitution || "none"} // Default to a meaningful placeholder
+                  >
+                    <SelectTrigger>
+                      {selectedInstitution
+                        ? selectedInstitution[1]
+                        : "Choisissezune institution"}
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none" disabled>
+                        Choisissez une institution
+                      </SelectItem>
+                      {institutions.map((inst) => (
+                        <SelectItem key={inst[0]} value={inst[0]}>
+                          {inst[1]}
+                        </SelectItem>
+                      ))}
+                      {/* Option to add a new institution */}
+                      <SelectItem value="new">
+                        Ajouter une nouvelle institution
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  {/* Add Institution Prompt */}
+                  {showAddInstitutionForm && (
+                    <div>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "10px",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Input
+                          type="text"
+                          placeholder={
+                            formData.type === "entreprise"
+                              ? "Nom de l'entreprise"
+                              : "Nom de l'école"
+                          }
+                          name="companyOrSchoolName"
+                          value={formData.companyOrSchoolName}
+                          onChange={handleChange}
+                        />
+                        <Input
+                          type="text"
+                          placeholder={
+                            formData.type === "entreprise"
+                              ? "Sécteur"
+                              : "Domaine d'études"
+                          }
+                          name="roleOrField"
+                          value={formData.roleOrField}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <Input
+                        type="number"
+                        placeholder={
+                          formData.type === "entreprise"
+                            ? "Téléphone de l'entreprise"
+                            : "Téléphone de l'école"
+                        }
+                        name="contactPhone"
+                        value={formData.contactPhone}
+                        onChange={handleChange}
+                      />
+                      <Input
+                        type="email"
+                        placeholder={
+                          formData.type === "entreprise"
+                            ? "Email de l'entreprise"
+                            : "Email de l'école"
+                        }
+                        name="contactEmail"
+                        value={formData.contactEmail}
+                        onChange={handleChange}
+                      />
+                      <Input
+                        type="text"
+                        placeholder={
+                          formData.type === "entreprise"
+                            ? "Adresse de l'entreprise"
+                            : "Adress de l'école"
+                        }
+                        name="adresse"
+                        value={formData.adresse}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  )}
+
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-center gap-2.5">
+                    <Button onClick={handlePrev}>Back</Button>
+                    <Button onClick={handleNext}>Next</Button>
                   </div>
                 </div>
               )}
@@ -424,6 +567,15 @@ export default function Sign() {
                       </strong>{" "}
                       {formData.contactEmail}
                     </p>
+                    <p>
+                      <strong>
+                        {formData.type === "entreprise"
+                          ? "Adresse de l'entreprise"
+                          : "Adresse de l'école"}
+                        :
+                      </strong>{" "}
+                      {formData.adresse}
+                    </p>
                   </div>
                   <div className="flex justify-center gap-2.5">
                     <button onClick={handlePrev}>Back</button>
@@ -439,12 +591,12 @@ export default function Sign() {
           <form>
             <h1>Se Connecter</h1>
             {error && <p style={{ color: "red" }}>{error}</p>}
-            <input
+            <Input
               type="email"
               placeholder="Email"
               onChange={(e) => setEmail(e.target.value)}
             />
-            <input
+            <Input
               type="password"
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}

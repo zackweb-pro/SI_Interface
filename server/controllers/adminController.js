@@ -58,42 +58,73 @@ async function createAdmin(req, res) {
 const getDemandes = async (req, res) => {
   try {
     const connection = await getConnection();
-    const query = `
-      SELECT 
-        r.id, r.nom, r.prenom, r.email, r.telephone, 
-        r.isconfirmed, r.type,
-        i.name AS institution_nom, i.email, i.telephone
-      FROM (
-        SELECT id, nom, prenom, email, telephone, isconfirmed, 'ecole' AS type, ecole_id AS institution_id 
-        FROM Respo_Ecole WHERE isconfirmed = 0
-        UNION ALL
-        SELECT id, nom, prenom, email, telephone, isconfirmed, 'entreprise' AS type, entreprise_id AS institution_id 
-        FROM Respo_Entreprise WHERE isconfirmed = 0
-      ) r
-      LEFT JOIN (
-        SELECT id, name, email, telephone FROM Ecole
-        UNION ALL
-        SELECT id, name, email, telephone FROM Entreprise
-      ) i ON r.institution_id = i.id
+
+    const ecoleQuery = `
+      SELECT id, nom, prenom, email, telephone, isconfirmed, ecole_id
+      FROM Respo_Ecole WHERE isconfirmed = 0
     `;
-    const result = await connection.execute(query);
-    console.log("Demandes:", result.rows);
-    const demandes = result.rows.map((row) => ({
-      id: row[0],
-      nom: row[1],
-      prenom: row[2],
-      email: row[3],
-      telephone: row[4],
-      isconfirmed: row[5],
-      type: row[6],
-      institution: {
-        nom: row[7],
-        contact_email: row[8],
-        contact_telephone: row[9],
-      },
+
+    const entrepriseQuery = `
+      SELECT id, nom, prenom, email, telephone, isconfirmed, entreprise_id
+      FROM Respo_Entreprise WHERE isconfirmed = 0
+    `;
+
+    const [ecoleResult, entrepriseResult] = await Promise.all([
+      connection.execute(ecoleQuery),
+      connection.execute(entrepriseQuery),
+    ]);
+
+    const ecoleDemandes = await Promise.all(ecoleResult.rows.map(async (row) => {
+      const institutionQuery = `SELECT name, email, telephone, adresse, domaine FROM Ecole WHERE id = :id`;
+      const institutionResult = await connection.execute(institutionQuery, { id: row[6] });
+      const institution = institutionResult.rows[0] || { name: null, email: null, telephone: null }; // Handle cases where institution might not exist
+      // console.log("Institution:", institution);
+      // console.log("Row:", row[0], row[1], row[2], row[3], row[4], row[5]);
+      return {
+        id: row[0],
+        nom: row[1],
+        prenom: row[2],
+        email: row[3],
+        telephone: row[4],
+        isconfirmed: row[5],
+        type: 'ecole',
+        institution: {
+          nom: institution[0],
+          contact_email: institution[1],
+          contact_telephone: institution[2],
+          adresse: institution[3],
+          domaine: institution[4],
+        },
+      };
     }));
 
-    res.status(200).json(demandes);
+    const entrepriseDemandes = await Promise.all(entrepriseResult.rows.map(async (row) => {
+      const institutionQuery = `SELECT name, email, telephone, adresse, secteur FROM Entreprise WHERE id = :id`;
+      const institutionResult = await connection.execute(institutionQuery, { id: row[6] });
+      const institution = institutionResult.rows[0] || { name: null, email: null, telephone: null };
+      // console.log("Institution:", institution);
+      // console.log("Rows:", row[0][0], row[1], row[2], row[3], row[4], row[5]);
+      return {
+        id: row[0],
+        nom: row[1],
+        prenom: row[2],
+        email: row[3],
+        telephone: row[4],
+        isconfirmed: row[5],
+        type: 'entreprise',
+        institution: {
+          nom: institution[0],
+          contact_email: institution[1],
+          contact_telephone: institution[2],
+          adresse: institution[3],
+          secteur: institution[4],
+        },
+      };
+    }));
+
+    const allDemandes = [...ecoleDemandes, ...entrepriseDemandes];
+
+    res.status(200).json(allDemandes);
   } catch (error) {
     console.error("Error fetching demandes:", error);
     res.status(500).json({ error: "Failed to fetch demandes" });
