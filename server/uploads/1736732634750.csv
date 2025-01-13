@@ -1,0 +1,5 @@
+nom,prenom,email,telephone,filiere,annee_scolarite
+Doe,John,john.doe@example.com,1234567890,Informatique,2023
+Smith,Jane,jane.smith@example.com,0987654321,Mathématiques,2024
+Brown,Charlie,charlie.brown@example.com,1122334455,Informatique,2023
+Johnson,Mary,mary.johnson@example.com,5566778899,Sciences,2025

@@ -1,28 +1,27 @@
 const express = require("express");
-const { addBulkStudents, addStudent } = require("../controllers/ecoleController");
+const { addBulkStudents, addStudent, getSelectedEntreprises, getAllEntreprises, selectEntreprise } = require("../controllers/ecoleController");
 const router = express.Router();
 
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const csv = require("csv-parser"); // Add this to parse CSV files
 
-// Ensure the uploads folder exists at the start of the server
+// Ensure the uploads folder exists
 const uploadPath = path.join(__dirname, "../uploads");
+
 if (!fs.existsSync(uploadPath)) {
-    console.log("Uploads folder does not exist, creating...");
     fs.mkdirSync(uploadPath, { recursive: true });
 } else {
-    console.log("Uploads folder exists:", uploadPath);
+    console.log("Upload path already exists:", uploadPath);
 }
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        console.log("Resolved upload path:", uploadPath);
         cb(null, uploadPath); // Pass the path to multer
     },
     filename: (req, file, cb) => {
         const uniqueName = Date.now() + path.extname(file.originalname);
-        console.log("Generated filename:", uniqueName);
         cb(null, uniqueName); // Add file extension
     },
 });
@@ -32,8 +31,9 @@ const upload = multer({
     limits: {
         fileSize: 10 * 1024 * 1024, // 10MB
     },
-}).single("file");
+}).single("file"); // Name of the field in your form
 
+// Route for bulk file upload
 router.post("/bulk", (req, res, next) => {
     upload(req, res, (err) => {
         if (err) {
@@ -48,7 +48,6 @@ router.post("/bulk", (req, res, next) => {
             return res.status(400).json({ error: "No file uploaded" });
         }
 
-        console.log("Uploaded file details:", req.file);
 
         // Ensure the file was written to the correct path
         if (!fs.existsSync(req.file.path)) {
@@ -56,11 +55,26 @@ router.post("/bulk", (req, res, next) => {
             return res.status(500).json({ error: "File was not saved correctly" });
         }
 
-        console.log("File successfully uploaded to:", req.file.path);
-        next();
+
+        // Process the CSV file after uploading
+        const results = [];
+        fs.createReadStream(req.file.path)
+            .pipe(csv())
+            .on("data", (data) => results.push(data))
+            .on("end", () => {
+                // Now you can process the CSV data (insert into DB, etc.)
+                // Pass the results to your addBulkStudents function or handle as needed
+                addBulkStudents(req, res, results); // Assuming addBulkStudents handles the data
+            })
+            .on("error", (error) => {
+                console.error("Error reading the CSV file:", error);
+                res.status(500).json({ error: "Error reading the CSV file" });
+            });
     });
-}, addBulkStudents);
+});
 
 router.post("/", addStudent);
-
+router.get("/", getAllEntreprises);
+router.post("/select", selectEntreprise);
+router.get("/selected/:id_respo", getSelectedEntreprises);
 module.exports = router;

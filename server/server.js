@@ -7,7 +7,7 @@ const loginRoutes = require("./routes/loginRoutes");
 const entrepriseRoutes = require("./routes/entrepriseRoutes");
 const cvRoutes = require("./routes/cvRoutes");
 const ecoleRoutes = require("./routes/ecoleRoutes");
-
+const etudiantRoutes = require("./routes/etudiantRoutes");
 const app = express();
 const PORT = 3000;
 
@@ -34,7 +34,7 @@ app.use("/api/login", loginRoutes);
 app.use("/api/entreprise", entrepriseRoutes);
 app.use("/api/cv", cvRoutes);
 app.use("/api/ecole", ecoleRoutes);
-
+app.use("/api/etudiant", etudiantRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
