@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "allowJs": true, // Enable .js file support
+    "jsx": "react-jsx", // Ensure React JSX support
+    "checkJs": false, // Skip type-checking for .js files
+    "baseUrl": ".", // Enables absolute imports
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}

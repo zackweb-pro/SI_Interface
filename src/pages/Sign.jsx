@@ -191,7 +191,9 @@ export default function Sign() {
         "nom: " + decodedToken.payload.nom,
         "prenom: " + decodedToken.payload.prenom
       );
-      if (decodedToken.payload.role === "admin") {
+      if (decodedToken.payload.role === "etudiant") {
+        window.location.href = "/offers";
+      } else if (decodedToken.payload.role === "admin") {
         window.location.href = "/admin-dashboard";
       } else if (decodedToken.payload.role === "respo_ecole") {
         window.location.href = "/respo-ecole-dashboard";

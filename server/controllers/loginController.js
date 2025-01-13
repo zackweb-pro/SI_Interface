@@ -63,6 +63,23 @@ const login = async (req, res) => {
       );
       return res.status(200).json({ message: "Login successful", token, user: { ...respoEntreprise, role: "respo_entreprise" } });
     }
+
+
+    const etudiantQuery = `SELECT id, nom, prenom, email FROM etudiant WHERE email = :email AND MDP = :password`;
+    const etudiantResult = await connection.execute(etudiantQuery, { email, password });
+
+    
+    if (etudiantResult.rows.length > 0) {
+      const etudiant = etudiantResult.rows[0];
+      const token = jwt.sign(
+        { id: etudiant[0], role: "etudiant", email: etudiant[3], nom: etudiant[1], prenom: etudiant[2] },
+        JWT_SECRET,
+        { expiresIn: "24h" } // Token valid for 24 hours
+      );
+      return res.status(200).json({ message: "Login successful", token, user: { ...etudiant, role: "etudiant" } });
+    }
+
+    console.log("Etudiant result:", etudiantResult.rows);
     console.log("Admin result:", adminResult.rows);
     console.log("Respo Ecole result:", respoEcoleResult.rows);
     console.log("Respo Entreprise result:", respoEntrepriseResult.rows);
