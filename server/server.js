@@ -6,6 +6,7 @@ const respoRoutes = require("./routes/respoRoutes");
 const loginRoutes = require("./routes/loginRoutes");
 const entrepriseRoutes = require("./routes/entrepriseRoutes");
 const cvRoutes = require("./routes/cvRoutes");
+const ecoleRoutes = require("./routes/ecoleRoutes");
 
 const app = express();
 const PORT = 3000;
@@ -32,6 +33,7 @@ app.use("/api/respo", respoRoutes);
 app.use("/api/login", loginRoutes);
 app.use("/api/entreprise", entrepriseRoutes);
 app.use("/api/cv", cvRoutes);
+app.use("/api/ecole", ecoleRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
