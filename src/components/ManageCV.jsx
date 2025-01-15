@@ -22,7 +22,7 @@ export default function CVEditor({
   const [newSectionType, setNewSectionType] = useState(null);
 
   const sectionTemplates = {
-    text: {
+    career: {
       type: "text",
       title: "About Me",
       content: "",
@@ -37,7 +37,7 @@ export default function CVEditor({
           title: "",
           authority: "",
           authorityWebSite: "",
-          rightSide: "t",
+          rightSide: "",
         },
       ],
     },
@@ -85,6 +85,12 @@ export default function CVEditor({
       title: "Languages",
       items: [{ authority: "", authorityMeta: "" }],
       icon: "language",
+    },
+    loisirs: {
+      type: "tag-list",
+      title: "Hobbies",
+      items: [],
+      icon: "heart",
     },
   };
   const handleAddSection = (type) => {
@@ -265,7 +271,7 @@ export default function CVEditor({
             <CardTitle>{section.title}</CardTitle>
           </CardHeader>
           <CardContent>
-            {section.type === "text" && (
+            {section.type === "text" && section.title === "About Me" && (
               <Textarea
                 value={section.content}
                 onChange={(e) => {
@@ -650,32 +656,33 @@ export default function CVEditor({
               </>
             )}
 
-            {section.type === "tag-list" && (
-              <>
-                <Input
-                  value={section.items || ""}
-                  onChange={(e) => {
-                    const items_h = e.target.value.split(",");
-                    console.log(e.target.value);
-                    handleUpdateSection(key, {
-                      ...section,
-                      items: items_h,
-                    });
-                  }}
-                  placeholder="the skills you have"
-                  className="mb-2"
-                />
+            {section.type === "tag-list" &&
+              section.title === "Skills Proficiency" && (
+                <>
+                  <Input
+                    value={section.items || ""}
+                    onChange={(e) => {
+                      const items_h = e.target.value.split(",");
+                      console.log(e.target.value);
+                      handleUpdateSection(key, {
+                        ...section,
+                        items: items_h,
+                      });
+                    }}
+                    placeholder="the skills you have"
+                    className="mb-2"
+                  />
 
-                <div className="add-rm-wrapper">
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleRemoveSection(key)}
-                  >
-                    <Trash size={16} className="mr-2" /> Remove Section
-                  </Button>
-                </div>
-              </>
-            )}
+                  <div className="add-rm-wrapper">
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleRemoveSection(key)}
+                    >
+                      <Trash size={16} className="mr-2" /> Remove Section
+                    </Button>
+                  </div>
+                </>
+              )}
 
             {section.type === "common-list" &&
               section.title === "Languages" && (
@@ -764,6 +771,33 @@ export default function CVEditor({
                   </div>
                 </>
               )}
+
+            {section.type === "tag-list" && section.title === "Hobbies" && (
+              <>
+                <Input
+                  value={section.items || ""}
+                  onChange={(e) => {
+                    const items_h = e.target.value.split(",");
+                    console.log(e.target.value);
+                    handleUpdateSection(key, {
+                      ...section,
+                      items: items_h,
+                    });
+                  }}
+                  placeholder="the Hobbies you have"
+                  className="mb-2"
+                />
+
+                <div className="add-rm-wrapper">
+                  <Button
+                    variant="destructive"
+                    onClick={() => handleRemoveSection(key)}
+                  >
+                    <Trash size={16} className="mr-2" /> Remove Section
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       ))}

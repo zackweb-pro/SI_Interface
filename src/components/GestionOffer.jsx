@@ -15,21 +15,21 @@ const GestionOffer = ({ offer }) => {
     const fetchCandidatures = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/api/candidatures?offer_id=${offer.id}`
+          `http://localhost:3000/api/offers/candidatures/${offer.OFFRE_ID}`
         );
-        setCandidatures(response.data.candidatures);
+        setCandidatures(response.data);
       } catch (error) {
         console.error("Failed to fetch candidatures:", error);
       }
     };
 
     fetchCandidatures();
-  }, [offer.id]);
+  }, [offer.OFFRE_ID]);
 
   // Handle delete offer
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/offers/${offer.id}`);
+      await axios.delete(`http://localhost:3000/api/offers/${offer.OFFRE_ID}`);
       alert("Offer deleted successfully");
       window.location.reload();
     } catch (error) {
@@ -40,7 +40,10 @@ const GestionOffer = ({ offer }) => {
   // Handle save modifications
   const handleSave = async () => {
     try {
-      await axios.put(`/api/offers/${offer.id}`, formData);
+      await axios.put(
+        `http://localhost:3000/api/offers/${offer.OFFRE_ID}`,
+        formData
+      );
       alert("Offer updated successfully");
       setIsEditing(false);
     } catch (error) {
@@ -52,15 +55,15 @@ const GestionOffer = ({ offer }) => {
     <div className="border p-4 rounded shadow-sm">
       {!isEditing ? (
         <>
-          <h2 className="text-lg font-bold">{offer.titre}</h2>
-          <p className="text-sm text-gray-600">{offer.description}</p>
+          <h2 className="text-lg font-bold">{offer.TITRE}</h2>
+          <p className="text-sm text-gray-600">{offer.DESCRIPTION}</p>
           <div className="flex space-x-2 mt-2">
-            <button
+            {/* <button
               className="px-4 py-2 bg-blue-600 text-white rounded"
               onClick={() => setIsEditing(true)}
             >
               Modify
-            </button>
+            </button> */}
             <button
               className="px-4 py-2 bg-red-600 text-white rounded"
               onClick={handleDelete}
@@ -105,7 +108,10 @@ const GestionOffer = ({ offer }) => {
       <h3 className="text-md font-semibold mt-4">Candidatures</h3>
       <div className="space-y-2">
         {candidatures.map((candidature) => (
-          <Candidature key={candidature.id} candidature={candidature} />
+          <Candidature
+            key={candidature.CANDIDATURE_ID}
+            candidature={candidature}
+          />
         ))}
       </div>
     </div>

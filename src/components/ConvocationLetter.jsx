@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const ConvocationCard = ({ details }) => {
+const ConvocationCard = ({ candidature, onConfirm }) => {
   const {
     candidateName,
     interviewDate,
@@ -61,7 +61,10 @@ const ConvocationCard = ({ details }) => {
 
         {/* Footer */}
         <div className="flex justify-between items-center">
-          <button className="relative group bg-[#E1372F] text-white py-2 px-6 rounded-lg font-semibold hover:bg-[#B53029] duration-300">
+          <button
+            className="relative group bg-[#E1372F] text-white py-2 px-6 rounded-lg font-semibold hover:bg-[#B53029] duration-300"
+            onclick={onConfirm}
+          >
             Confirm Attendance
             <span className="absolute inset-0 bg-[#FF6B6B] rounded-lg opacity-0 group-hover:opacity-20 duration-300"></span>
           </button>

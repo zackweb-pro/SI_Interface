@@ -59,8 +59,12 @@ const Candidatures = () => {
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        const response = await axios.get(`/api/offers?respo_id=${respo_id}`);
-        setOffers(response.data.offers);
+        const response = await axios.get(
+          `http://localhost:3000/api/offers/get/${respo_id}`,
+          respo_id
+        );
+        console.log(response.data);
+        setOffers(response.data);
       } catch (error) {
         console.error("Failed to fetch offers:", error);
       }
@@ -75,7 +79,7 @@ const Candidatures = () => {
         <h1 className="text-xl font-bold mb-4">Gestion des Candidatures</h1>
         <div className="space-y-4">
           {offers.map((offer) => (
-            <GestionOffer key={offer.id} offer={offer} />
+            <GestionOffer key={offer.OFFRE_ID} offer={offer} />
           ))}
         </div>
       </div>

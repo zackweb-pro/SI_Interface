@@ -85,7 +85,7 @@ const Menu = ({ user, onLogout, children, items, role }) => {
           <div className="flex items-center justify-between p-4">
             <div>
               <p className="text-sm font-medium text-gray-900">{user.name}</p>
-              <p className="text-sm text-gray-600">{user.email}</p>
+              <p className="text-xs text-gray-600">{user.email}</p>
             </div>
 
             {/* Dropdown Menu for Profile and Logout */}

@@ -18,17 +18,10 @@ import { Button } from "@/components/ui/button";
 import decodeJWT from "@/components/DecodeJWT";
 export default function UpdateCV() {
   const [personalData, setPersonalData] = useState({
-    name: "Zakaria OUMGAHR",
-    title: "Senior Software Developer",
-    image: profile,
-    contacts: [
-      { type: "email", value: "zakaria.oumghar1@gmail.com" },
-      { type: "phone", value: "+1-0000000000" },
-      { type: "location", value: "Berrechid" },
-      { type: "website", value: "example.com" },
-      { type: "linkedin", value: "linkedin.com/in/zakaria-oumghar-b30b9b1bb/" },
-      { type: "github", value: "github.com/zackweb-pro" },
-    ],
+    name: "",
+    title: "",
+    image: null,
+    contacts: [{ type: "", value: "" }],
   });
   const { nom, prenom, email, id, role } = decodeJWT(
     localStorage.getItem("authToken")
@@ -65,9 +58,8 @@ export default function UpdateCV() {
     career: {
       type: "text",
       title: "About Me",
-      content:
-        "Greetings! I'm Zakaria Oumghar, a dedicated software engineering student at ENSIAS. I'm deeply passionate about programming, diving into new technologies, and exploring creativity and art.",
-      icon: "usertie",
+      content: "",
+      icon: "plus",
     },
     education: {
       type: "common-list",
@@ -75,36 +67,26 @@ export default function UpdateCV() {
       icon: "graduation",
       items: [
         {
-          title:
-            "2 years of preparatory classes for engineering schools (CPGE)",
-          authority: "CPGE",
-          authorityWebSite: "https://www.cpge.ac.ma/",
-          rightSide: "2021 - 2023",
-        },
-        {
-          title: "SOFTWARE ENGINEER (SE)",
-          authority: "ENSIAS",
-          authorityWebSite: "https://www.ensias.um5.ac.ma/",
-          rightSide: "2023 - Present",
+          title: "",
+          authority: "",
+          authorityWebSite: "",
+          rightSide: "",
         },
       ],
     },
-    experience: {
+    experiences: {
       type: "experiences-list",
       title: "Experiences",
+      icon: "archive",
       items: [
         {
-          title: "Software Developer Intern",
-          company: "SOMAP",
-          companyWebSite: "https://www.somap.ma/",
-          description:
-            "Worked on a management system for purchases and personnel.",
-          companyMeta: "",
-          datesBetween: "2024",
-          descriptionTags: ["React", "Node.js", "MySQL"],
+          title: "",
+          company: "",
+          datesBetween: "",
+          description: "",
+          descriptionTags: "",
         },
       ],
-      icon: "archive",
     },
     projects: {
       type: "projects-list",
@@ -113,15 +95,13 @@ export default function UpdateCV() {
       icon: "tasks",
       groups: [
         {
-          sectionHeader:
-            "application web de gestion des achats et du personnel",
-          description: " ",
+          sectionHeader: "",
+          description: "",
           items: [
             {
-              title: "Lien du projet",
-              projectUrl: "https://github.com/zackweb-pro",
-              description:
-                "j'ai travaillé sur un système de gestion des achats et du personnel",
+              title: "",
+              projectUrl: "",
+              description: "",
             },
           ],
         },
@@ -130,18 +110,20 @@ export default function UpdateCV() {
     skills: {
       type: "tag-list",
       title: "Skills Proficiency",
-      items: ["React", "Node.js", "JavaScript", "CSS", "SQL"],
       icon: "rocket",
+      items: [],
     },
-    languages: {
+    languanges: {
       type: "common-list",
       title: "Languages",
-      items: [
-        { authority: "English", authorityMeta: "Professional" },
-        { authority: "French", authorityMeta: "Fluent" },
-        { authority: "Arabic", authorityMeta: "Native" },
-      ],
+      items: [{ authority: "", authorityMeta: "" }],
       icon: "language",
+    },
+    loisirs: {
+      type: "tag-list",
+      title: "Hobbies",
+      items: [],
+      icon: "heart",
     },
   });
   // console.log(sections);
@@ -152,7 +134,7 @@ export default function UpdateCV() {
     doc.save("CV.pdf");
   };
   const onsave = async () => {
-    const userId = localStorage.getItem("user_id"); // Assuming user_id is stored in localStorage
+    const userId = id; // Assuming user_id is stored in localStorage
     const data = { personalData, sections, userId };
 
     try {
@@ -175,13 +157,36 @@ export default function UpdateCV() {
   useEffect(() => {
     // Fetch CV data on component mount
     const fetchCV = async () => {
-      const userId = localStorage.getItem("user_id");
+      const userId = id;
       try {
-        const response = await fetch(`http://localhost:5000/api/cv/${userId}`);
+        const response = await fetch(`http://localhost:3000/api/cv/${userId}`);
         if (response.ok) {
           const data = await response.json();
-          setPersonalData(data.personalData);
+          console.log("response", data);
+
+          // Ensure aboutMe is a string, especially if it's coming as a CLOB from the backend
+          const aboutMeContent = data.personalData.aboutMe || ""; // Default to empty string if undefined
+
+          setPersonalData({ ...data.personalData, aboutMe: aboutMeContent });
           setSections(data.sections);
+
+          setSections({
+            ...sections,
+            career: {
+              ...sections.career,
+              content: String(personalData.aboutMe), // Ensure content is a string
+            },
+            projects: {
+              ...sections.projects,
+              groups: sections.projects.groups.map((group) => ({
+                ...group,
+                items: group.items.map((item) => ({
+                  ...item,
+                  description: String(item.description), // Ensure description is a string
+                })),
+              })),
+            },
+          });
         }
       } catch (error) {
         console.error("Error fetching CV:", error);
@@ -189,7 +194,8 @@ export default function UpdateCV() {
     };
 
     fetchCV();
-  }, []);
+  }, [id]);
+
   return (
     <SidebarMenu
       role={"Etudiant"}
