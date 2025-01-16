@@ -13,7 +13,6 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
 });
 
-
 const applyForOffer = async (req, res) => {
   const uploadMiddleware = upload.single("cvFile");
 
@@ -46,7 +45,11 @@ const applyForOffer = async (req, res) => {
 
       // Generate a unique filename for the CV
       const uniqueFilename = `${Date.now()}-${cvFile.originalname}`;
-      const uploadPath = path.join(__dirname, "../uploads/cvis", uniqueFilename);
+      const uploadPath = path.join(
+        __dirname,
+        "../uploads/cvis",
+        uniqueFilename
+      );
 
       // Save the CV file to the filesystem
       fs.writeFileSync(uploadPath, cvFile.buffer);
@@ -73,49 +76,49 @@ const applyForOffer = async (req, res) => {
   });
 };
 
-
-
-
-
 // Fetch offers based on relationships
 const getOffersByUser = async (req, res) => {
-    const { userId } = req.params; // Fetch the userId from the request parameters
-    let connection;
-  
-    try {
-      connection = await getConnection(); // Establish a connection to the OracleDB
-  
-      // Step 1: Fetch the student's school ID
-      const ecoleResult = await connection.execute(
-        `SELECT id_ecole FROM etudiant WHERE id = :userId`,
-        { userId }, // Bind userId
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-  
-      if (!ecoleResult.rows.length) {
-        return res.status(404).json({ error: "Student not found" });
-      }
-  
-      const id_ecole = ecoleResult.rows[0].ID_ECOLE; // Extract school ID
-  
-      // Step 2: Fetch the enterprise IDs linked to the school
-      const entrepriseResult = await connection.execute(
-        `SELECT id_entreprise FROM select_entreprise WHERE id_ecole = :id_ecole`,
-        { id_ecole }, // Bind school ID
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-  
-      const entrepriseIds = entrepriseResult.rows.map((row) => row.ID_ENTREPRISE);
-  
-      if (!entrepriseIds.length) {
-        return res.status(404).json({ error: "No offers available for this user" });
-      }
-  
-      // Step 3: Create placeholders for enterprise IDs dynamically
-      const placeholders = entrepriseIds.map((_, index) => `:${index + 1}`).join(", ");
-  
-      // Step 4: Fetch offers for the enterprises
-      const offerQuery = `
+  const { userId } = req.params; // Fetch the userId from the request parameters
+  let connection;
+
+  try {
+    connection = await getConnection(); // Establish a connection to the OracleDB
+
+    // Step 1: Fetch the student's school ID
+    const ecoleResult = await connection.execute(
+      `SELECT id_ecole FROM etudiant WHERE id = :userId`,
+      { userId }, // Bind userId
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    if (!ecoleResult.rows.length) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    const id_ecole = ecoleResult.rows[0].ID_ECOLE; // Extract school ID
+
+    // Step 2: Fetch the enterprise IDs linked to the school
+    const entrepriseResult = await connection.execute(
+      `SELECT id_entreprise FROM select_entreprise WHERE id_ecole = :id_ecole`,
+      { id_ecole }, // Bind school ID
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    const entrepriseIds = entrepriseResult.rows.map((row) => row.ID_ENTREPRISE);
+
+    if (!entrepriseIds.length) {
+      return res
+        .status(404)
+        .json({ error: "No offers available for this user" });
+    }
+
+    // Step 3: Create placeholders for enterprise IDs dynamically
+    const placeholders = entrepriseIds
+      .map((_, index) => `:${index + 1}`)
+      .join(", ");
+
+    // Step 4: Fetch offers for the enterprises
+    const offerQuery = `
       SELECT 
         offres.*,
         entreprise.name AS entreprise_nom,
@@ -126,51 +129,44 @@ const getOffersByUser = async (req, res) => {
         ON offres.entreprise_id = entreprise.id
       WHERE offres.entreprise_id IN (${placeholders})
     `;
-    
-  
-      // Bind values dynamically
-      const bindParams = {};
-      entrepriseIds.forEach((id, index) => {
-        bindParams[index + 1] = id;
-      });
-  
-      const offerResult = await connection.execute(
-        offerQuery,
-        bindParams,
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-  
-  
-      return res.status(200).json(offerResult.rows);
-    } catch (error) {
-      console.error("Error fetching offers:", error);
-      return res.status(500).json({ error: "Failed to fetch offers" });
-    } finally {
-      if (connection) {
-        try {
-          await connection.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
+
+    // Bind values dynamically
+    const bindParams = {};
+    entrepriseIds.forEach((id, index) => {
+      bindParams[index + 1] = id;
+    });
+
+    const offerResult = await connection.execute(offerQuery, bindParams, {
+      outFormat: oracledb.OUT_FORMAT_OBJECT,
+    });
+
+    return res.status(200).json(offerResult.rows);
+  } catch (error) {
+    console.error("Error fetching offers:", error);
+    return res.status(500).json({ error: "Failed to fetch offers" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (closeError) {
+        console.error("Error closing connection:", closeError);
       }
     }
-  };
-  
-  const getOffers = async (req, res) => {
- 
-    
-  
-    let connection;
-  
-    try {
-        const userId = Number(req.params.respo_id);
+  }
+};
 
-        if (isNaN(userId)) {
-          return res.status(400).json({ error: "Invalid respo_id provided." });
-        }
-      connection = await getConnection();
-  
-      const offerQuery = `
+const getOffers = async (req, res) => {
+  let connection;
+
+  try {
+    const userId = Number(req.params.respo_id);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: "Invalid respo_id provided." });
+    }
+    connection = await getConnection();
+
+    const offerQuery = `
         SELECT 
           offres.*,
           entreprise.name AS entreprise_nom,
@@ -181,46 +177,46 @@ const getOffersByUser = async (req, res) => {
           ON offres.entreprise_id = entreprise.id
         WHERE offres.id_responsable = :userId
       `;
-  
-      const offerResult = await connection.execute(
-        offerQuery,
-        { userId },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
-  
-      console.log("Offer Results:", offerResult.rows);
-  
-      return res.status(200).json(offerResult.rows);
-    } catch (error) {
-      console.error("Error fetching offers:", error);
-      return res.status(500).json({ error: "Failed to fetch offers" });
-    } finally {
-      if (connection) {
-        try {
-          await connection.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
+
+    const offerResult = await connection.execute(
+      offerQuery,
+      { userId },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    console.log("Offer Results:", offerResult.rows);
+
+    return res.status(200).json(offerResult.rows);
+  } catch (error) {
+    console.error("Error fetching offers:", error);
+    return res.status(500).json({ error: "Failed to fetch offers" });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (closeError) {
+        console.error("Error closing connection:", closeError);
       }
     }
-  };
-  
-  const getCandidatures = async (req, res) => {
-    let connection;
-  
-    try {
-      // Extract and validate offer_id
-      const { offer_id } = req.params;
-  
-      if (!offer_id || isNaN(Number(offer_id))) {
-        return res.status(400).json({ error: "Invalid or missing offer_id." });
-      }
-  
-      const offerId = Number(offer_id); // Ensure offerId is a number
-  
-      connection = await getConnection(); // Get OracleDB connection
-  
-      const candidatureQuery = `
+  }
+};
+
+const getCandidatures = async (req, res) => {
+  let connection;
+
+  try {
+    // Extract and validate offer_id
+    const { offer_id } = req.params;
+
+    if (!offer_id || isNaN(Number(offer_id))) {
+      return res.status(400).json({ error: "Invalid or missing offer_id." });
+    }
+
+    const offerId = Number(offer_id); // Ensure offerId is a number
+
+    connection = await getConnection(); // Get OracleDB connection
+
+    const candidatureQuery = `
         SELECT 
           candidature.id AS candidature_id,
           candidature.id_etudiant,
@@ -262,41 +258,43 @@ const getOffersByUser = async (req, res) => {
         WHERE candidature.id_offre = :offer_id
         AND candidature.is_approved = 0
       `;
-  
-      // Execute the query with bind parameters
-      const offerResult = await connection.execute(
-        candidatureQuery,
-        { offer_id: offerId }, // Bind parameter
-        { outFormat: oracledb.OUT_FORMAT_OBJECT } // Format as object
-      );
-  
-      console.log("Candidature Results by Offer:", offerResult.rows);
-  
-      return res.status(200).json(offerResult.rows); // Return results
-    } catch (error) {
-      console.error("Error fetching candidatures by offer:", error);
-      return res.status(500).json({ error: "Failed to fetch candidatures by offer." });
-    } finally {
-      if (connection) {
-        try {
-          await connection.close(); // Close connection
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
+
+    // Execute the query with bind parameters
+    const offerResult = await connection.execute(
+      candidatureQuery,
+      { offer_id: offerId }, // Bind parameter
+      { outFormat: oracledb.OUT_FORMAT_OBJECT } // Format as object
+    );
+
+    console.log("Candidature Results by Offer:", offerResult.rows);
+
+    return res.status(200).json(offerResult.rows); // Return results
+  } catch (error) {
+    console.error("Error fetching candidatures by offer:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to fetch candidatures by offer." });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close(); // Close connection
+      } catch (closeError) {
+        console.error("Error closing connection:", closeError);
       }
     }
-  };
-  
-  const approveCandidature = async (req, res) => {
-    const { id } = req.params;
-    const { date_interview, time_interview, place, is_approved } = req.body;
-  
-    let connection;
-  
-    try {
-      connection = await getConnection(); // Get OracleDB connection
-  
-      const updateQuery = `
+  }
+};
+
+const approveCandidature = async (req, res) => {
+  const { id } = req.params;
+  const { date_interview, time_interview, place, is_approved } = req.body;
+
+  let connection;
+
+  try {
+    connection = await getConnection(); // Get OracleDB connection
+
+    const updateQuery = `
         UPDATE candidature
         SET 
           date_interview = TO_DATE(:date_interview, 'YYYY-MM-DD'),
@@ -305,35 +303,42 @@ const getOffersByUser = async (req, res) => {
           is_approved = :is_approved
         WHERE id = :id
       `;
-  
-      await connection.execute(
-        updateQuery,
-        { date_interview, time_interview, place, is_approved, id },
-        { autoCommit: true }
-      );
-  
-      res.status(200).json({ message: "Candidature updated successfully." });
-    } catch (error) {
-      console.error("Error updating candidature:", error);
-      res.status(500).json({ error: "Failed to update candidature." });
-    } finally {
-      if (connection) {
-        try {
-          await connection.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
+
+    await connection.execute(
+      updateQuery,
+      { date_interview, time_interview, place, is_approved, id },
+      { autoCommit: true }
+    );
+
+    res.status(200).json({ message: "Candidature updated successfully." });
+  } catch (error) {
+    console.error("Error updating candidature:", error);
+    res.status(500).json({ error: "Failed to update candidature." });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (closeError) {
+        console.error("Error closing connection:", closeError);
       }
     }
-  };
-  
-  const getApprovedCandidatures = async (req, res) => {
-    let connection;
-  
-    try {
-      connection = await getConnection(); // Get OracleDB connection
-  
-      const query = `
+  }
+};
+
+const getApprovedCandidatures = async (req, res) => {
+  let connection;
+
+  try {
+    connection = await getConnection(); // Get OracleDB connection
+
+    let { user_id } = req.params;
+
+    if (!user_id || isNaN(Number(user_id))) {
+      return res.status(400).json({ error: "Invalid or missing offer_id." });
+    }
+
+    user_id = Number(user_id); // Ensure offerId is a number
+    const query = `
         SELECT 
           candidature.id AS candidature_id,
           candidature.id_etudiant,
@@ -350,74 +355,198 @@ const getOffersByUser = async (req, res) => {
   
           offres.titre AS offre_titre
         FROM candidature
-        INNER JOIN etudiant ON candidature.id_etudiant = etudiant.id
+        INNER JOIN etudiant ON candidature.id_etudiant = :user_id
         INNER JOIN offres ON candidature.id_offre = offres.offre_id
         WHERE candidature.is_approved = 1 AND candidature.is_confirmed = 0
       `;
-  
-      const result = await connection.execute(query, {}, { outFormat: oracledb.OUT_FORMAT_OBJECT });
-      console.log("Approved Candidatures:", result.rows);
-      res.status(200).json(result.rows);
-    } catch (error) {
-      console.error("Error fetching candidatures:", error);
-      res.status(500).json({ error: "Failed to fetch candidatures." });
-    } finally {
-      if (connection) {
-        try {
-          await connection.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
+
+    const result = await connection.execute(
+      query,
+      { user_id },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    console.log("Approved Candidatures:", result.rows);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching candidatures:", error);
+    res.status(500).json({ error: "Failed to fetch candidatures." });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (closeError) {
+        console.error("Error closing connection:", closeError);
       }
     }
-  };
-  
-  const confirmAttendance = async (req, res) => {
-    const { id } = req.params; // Candidature ID
-    let connection;
-  
-    try {
-      connection = await getConnection(); // Get OracleDB connection
-  
-      const updateQuery = `
+  }
+};
+
+const confirmAttendance = async (req, res) => {
+  const { id } = req.params; // Candidature ID
+  let connection;
+
+  try {
+    connection = await getConnection(); // Get OracleDB connection
+
+    const updateQuery = `
         UPDATE candidature
         SET is_confirmed = 1
         WHERE id = :id AND is_approved = 1 AND is_confirmed = 0
       `;
-  
-      const result = await connection.execute(
-        updateQuery,
-        { id },
-        { autoCommit: true }
-      );
-  
-      if (result.rowsAffected === 0) {
-        return res.status(404).json({ error: "Candidature not found or already confirmed." });
-      }
-  
-      res.status(200).json({ message: "Attendance confirmed successfully." });
-    } catch (error) {
-      console.error("Error confirming attendance:", error);
-      res.status(500).json({ error: "Failed to confirm attendance." });
-    } finally {
-      if (connection) {
-        try {
-          await connection.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
+
+    const result = await connection.execute(
+      updateQuery,
+      { id },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected === 0) {
+      return res
+        .status(404)
+        .json({ error: "Candidature not found or already confirmed." });
+    }
+
+    res.status(200).json({ message: "Attendance confirmed successfully." });
+  } catch (error) {
+    console.error("Error confirming attendance:", error);
+    res.status(500).json({ error: "Failed to confirm attendance." });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (closeError) {
+        console.error("Error closing connection:", closeError);
       }
     }
-  };
-  
-  
-  
+  }
+};
+
+const getInterviewsByOfferId = async (req, res) => {
+  let connection;
+
+  try {
+    connection = await getConnection(); // Get OracleDB connection
+
+    const { offer_id } = req.params;
+
+    if (!offer_id || isNaN(Number(offer_id))) {
+      return res.status(400).json({ error: "Invalid or missing offer_id." });
+    }
+    console.log("Offer ID:", offer_id);
+    const query = `
+      SELECT 
+        candidature.id AS candidature_id,
+        candidature.id_etudiant,
+        candidature.id_offre,
+        candidature.date_interview,
+        candidature.time_interview,
+        candidature.place,
+
+        etudiant.nom AS etudiant_nom,
+        etudiant.prenom AS etudiant_prenom,
+        etudiant.email AS etudiant_email,
+
+        offres.titre AS offre_titre
+      FROM candidature
+      INNER JOIN etudiant ON candidature.id_etudiant = etudiant.id
+      INNER JOIN offres ON candidature.id_offre = offres.offre_id
+      WHERE candidature.id_offre = :offer_id
+        AND candidature.is_approved = 1
+        AND candidature.is_confirmed = 1
+        AND candidature.statut_interview = 0
+    `;
+
+    const result = await connection.execute(
+      query,
+      { offer_id: Number(offer_id) },
+      { outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+    console.log("Interviews by Offer ID:", result.rows);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No interviews found." });
+    }
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching interviews:", error);
+    res.status(500).json({ error: "Failed to fetch interviews." });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (closeError) {
+        console.error("Error closing connection:", closeError);
+      }
+    }
+  }
+};
+
+const addStage = async (req, res) => {
+  let connection;
+
+  try {
+    connection = await getConnection(); // Get OracleDB connection
+    const { id_offre, id_etudiant, startDate, endDate } = req.params;
+    let statut_stage = 0;
+    let note = 0;
+    if (!id_offre || !id_etudiant || !startDate || !endDate) {
+      return res.status(400).json({ error: "Missing required parameters." });
+    }
+
+    const query = `
+      INSERT INTO stage (id_offre, id_etudiant, statut_stage, note, starting_date, ending_date, statut_interview)
+      VALUES (:id_offre, :id_etudiant, :statut_stage, :note, TO_DATE(:startDate, 'YYYY-MM-DD'), TO_DATE(:endDate, 'YYYY-MM-DD'), 1)
+    `;
+    console.log("Executing Query:", query);
+    console.log("Parameters:", {
+      id_offre,
+      id_etudiant,
+      statut_stage,
+      note,
+      startDate,
+      endDate,
+    });
+
+    const result = await connection.execute(
+      query,
+      {
+        id_offre,
+        id_etudiant,
+        statut_stage,
+        note,
+        startDate,
+        endDate,
+      },
+      { autoCommit: true }
+    );
+
+    if (result.rowsAffected === 0) {
+      return res.status(500).json({ error: "Failed to add stage." });
+    }
+
+    res.status(201).json({ message: "Stage added successfully." });
+  } catch (error) {
+    console.error("Error adding stage:", error);
+    res.status(500).json({ error: "Failed to add stage." });
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (closeError) {
+        console.error("Error closing connection:", closeError);
+      }
+    }
+  }
+};
+
 module.exports = {
-    applyForOffer,
-    getOffersByUser,
-    getOffers,
-    getCandidatures,
-    approveCandidature,
-    getApprovedCandidatures,
-    confirmAttendance,
+  applyForOffer,
+  getOffersByUser,
+  getOffers,
+  getCandidatures,
+  approveCandidature,
+  getApprovedCandidatures,
+  confirmAttendance,
+  getInterviewsByOfferId,
+  addStage,
 };

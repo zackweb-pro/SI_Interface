@@ -196,7 +196,7 @@ export default function Sign() {
       } else if (decodedToken.payload.role === "admin") {
         window.location.href = "/admin-dashboard";
       } else if (decodedToken.payload.role === "respo_ecole") {
-        window.location.href = "/respo-ecole-dashboard";
+        window.location.href = "/select-entreprise";
       } else if (decodedToken.payload.role === "respo_entreprise") {
         window.location.href = "/ajouter-offre";
       }

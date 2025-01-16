@@ -126,7 +126,7 @@ const SelectEntreprise = () => {
   return (
     <SidebarMenu
       user={user}
-      role={"Entreprise"}
+      role={"Ecole"}
       onLogout={() => {
         localStorage.removeItem("authToken");
         window.location.href = "/";

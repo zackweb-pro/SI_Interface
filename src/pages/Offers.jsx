@@ -21,8 +21,9 @@ const Offers = () => {
 
   const menuItems = [
     { icon: Home, label: "Offers", value: "offers", path: "/offers" },
-    { icon: BarChart, label: "CV", value: "update-cv", path: "/update-cv" },
+    // { icon: BarChart, label: "CV", value: "update-cv", path: "/update-cv" },
     { icon: FileCheck2, label: "Convocation", value: "convo", path: "/convo" },
+    { icon: FileCheck2, label: "changer etat", value: "change-etat", path: "/changer-etat" },
   ];
 
   const handleLogout = () => {

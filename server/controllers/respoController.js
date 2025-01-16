@@ -6,7 +6,8 @@ const oracledb = require("oracledb");
 exports.getEcoles = async (req, res) => {
   try {
     const connection = await getConnection();
-    const query = "SELECT id, name, domaine, telephone, email, adresse FROM Ecole";
+    const query =
+      "SELECT id, name, domaine, telephone, email, adresse FROM Ecole";
     const result = await connection.execute(query);
     res.status(200).json(result.rows);
   } catch (error) {
@@ -19,7 +20,8 @@ exports.getEcoles = async (req, res) => {
 exports.getEntreprises = async (req, res) => {
   try {
     const connection = await getConnection();
-    const query = "SELECT id, name, secteur, telephone, email, adresse FROM Entreprise";
+    const query =
+      "SELECT id, name, secteur, telephone, email, adresse FROM Entreprise";
     const result = await connection.execute(query);
     res.status(200).json(result.rows);
   } catch (error) {
@@ -27,8 +29,6 @@ exports.getEntreprises = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch Entreprises" });
   }
 };
-
-
 
 exports.createRespoEcole = async (req, res) => {
   const {
@@ -74,25 +74,29 @@ exports.createRespoEcole = async (req, res) => {
 
       // Fetch the auto-generated ID for the new school
       const fetchEcoleIdQuery = `SELECT id FROM Ecole WHERE name = :name AND email = :email AND telephone = :telephone`;
-      const fetchResult = await connection.execute(
-        fetchEcoleIdQuery,
-        {
-          name: companyOrSchoolName,
-          email: contactEmail,
-          telephone: contactPhone,
-        }
-      );
+      const fetchResult = await connection.execute(fetchEcoleIdQuery, {
+        name: companyOrSchoolName,
+        email: contactEmail,
+        telephone: contactPhone,
+      });
       ecoleId = fetchResult.rows[0][0]; // Get the generated ID from the query result
     }
 
     // Insert the Respo_Ecole
     const insertRespoQuery = `
-      INSERT INTO Respo_Ecole (nom, prenom, email, telephone, ecole_id, password, isConfirmed)
-      VALUES (:firstName, :lastName, :email, :phone, :ecoleId, :password, 0)
+      INSERT INTO Respo_Ecole (nom, prenom, email, telephone, ecole_id, password, isConfirmed, statut)
+      VALUES (:firstName, :lastName, :email, :phone, :ecoleId, :password, 0, 'responsable ecole')
     `;
     await connection.execute(
       insertRespoQuery,
-      { firstName, lastName, email, phone, ecoleId, password: generatedPassword },
+      {
+        firstName,
+        lastName,
+        email,
+        phone,
+        ecoleId,
+        password: generatedPassword,
+      },
       { autoCommit: true }
     );
 
@@ -152,25 +156,29 @@ exports.createRespoEntreprise = async (req, res) => {
       const fetchEntrepriseIdQuery = `
         SELECT id FROM Entreprise WHERE name = :name AND email = :email AND telephone = :telephone
       `;
-      const fetchResult = await connection.execute(
-        fetchEntrepriseIdQuery,
-        {
-          name: companyOrSchoolName,
-          email: contactEmail,
-          telephone: contactPhone,
-        }
-      );
+      const fetchResult = await connection.execute(fetchEntrepriseIdQuery, {
+        name: companyOrSchoolName,
+        email: contactEmail,
+        telephone: contactPhone,
+      });
       entrepriseId = fetchResult.rows[0][0]; // Get the generated ID from the query result
     }
 
     // Insert the Respo_Entreprise
     const insertRespoQuery = `
-      INSERT INTO Respo_Entreprise (nom, prenom, email, telephone, entreprise_id, password, isConfirmed)
-      VALUES (:firstName, :lastName, :email, :phone, :entrepriseId, :password, 0)
+      INSERT INTO Respo_Entreprise (nom, prenom, email, telephone, entreprise_id, password, isConfirmed, statut)
+      VALUES (:firstName, :lastName, :email, :phone, :entrepriseId, :password, 0, 'responsable entreprise')
     `;
     await connection.execute(
       insertRespoQuery,
-      { firstName, lastName, email, phone, entrepriseId, password: generatedPassword },
+      {
+        firstName,
+        lastName,
+        email,
+        phone,
+        entrepriseId,
+        password: generatedPassword,
+      },
       { autoCommit: true }
     );
 
@@ -183,4 +191,3 @@ exports.createRespoEntreprise = async (req, res) => {
     res.status(500).json({ error: "Failed to create Respo_Entreprise" });
   }
 };
-

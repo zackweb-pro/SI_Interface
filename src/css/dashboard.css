@@ -4,3 +4,6 @@
   align-items: center;
   gap: 10px;
 }
+#container{
+  width: 800px;
+}

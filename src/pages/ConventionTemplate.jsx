@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-
+import { Textarea } from "@/components/ui/textarea";
 import {
   Home,
   BarChart,
@@ -63,12 +63,18 @@ const Dashboard = () => {
   return (
     <SidebarMenu
       user={user}
-      role={"Entreprise"}
+      role={"Ecole"}
       onLogout={() => {
         localStorage.removeItem("authToken");
         window.location.href = "/";
       }}
       items={items}
+      children={
+        <Textarea
+          placeholder="Ecrire la convention en remplaceant nom d'etudiant par NOM_ETUDIANT et nom d'entreprise par NOM_ENTREPRISE..."
+        />
+
+      }
     />
   );
 };
